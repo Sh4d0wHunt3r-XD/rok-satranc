@@ -20,11 +20,12 @@ const Pwa = {
       });
     }
     const cr = $('#settingsModal .credit');
-    if (cr) cr.insertAdjacentHTML('beforeend', ` Sürüm: ${APP_VERSION.replace('rok-v', '')}.`);
+    if (cr) cr.insertAdjacentHTML('beforeend', ` Sürüm ${this.label()}.`);
     window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); this.prompt = e; this.renderBtn(); });
     window.addEventListener('appinstalled', () => { this.prompt = null; this.renderBtn(); toast('Rok telefonuna kuruldu!'); });
     if (NO_SERVER) this.noServer();
   },
+  label() { return '1.' + APP_VERSION.replace('rok-v', ''); }, // rok-v7 -> 1.7
   inGame() { return !$('#game').hidden && G.mode && !G.over && G.moves.length > 0; },
   renderBtn() {
     let b = $('#installBtn');
