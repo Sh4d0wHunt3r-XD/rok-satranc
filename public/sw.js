@@ -1,6 +1,6 @@
 /* Rok Satranç — servis çalışanı: dosyaları önbelleğe alır, internet olmadan da açılır.
    Yeni sürüm yayınlarken VERSION'ı artır. */
-const VERSION = 'rok-v3';
+const VERSION = 'rok-v4';
 const FILES = [
   './', 'index.html', 'style.css', 'pages.css', 'manifest.webmanifest',
   'pieces.js', 'chess.js', 'sf.js', 'app.js', 'bots.js', 'extra.js', 'drill.js', 'miniboard.js', 'pzplus.js', 'learn.js',

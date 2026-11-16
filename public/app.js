@@ -783,9 +783,14 @@ function renderMoves() {
   }
   if (!G.moves.length && !G.over) h = G.mode === 'puzzle' ? '' : '<p class="empty">Hamleler burada not edilir.</p>';
   el.innerHTML = h;
+  // Sadece hamle listesinin kendi içini kaydır. scrollIntoView sayfayı da kaydırıyordu:
+  // telefonda liste tahtanın altında olduğu için bot her oynadığında tahta yukarı kaçıyordu.
   const curEl = $('.mv.cur', el);
-  if (curEl) curEl.scrollIntoView({ block: 'nearest' });
-  else el.scrollTop = el.scrollHeight;
+  if (curEl) {
+    const er = el.getBoundingClientRect(), cr = curEl.getBoundingClientRect();
+    if (cr.top < er.top) el.scrollTop -= er.top - cr.top;
+    else if (cr.bottom > er.bottom) el.scrollTop += cr.bottom - er.bottom;
+  } else el.scrollTop = el.scrollHeight;
 }
 const FIG = { K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘' };
 const figurine = (san, color) => san.replace(/^[KQRBN]/, c => FIG[c]).replace(/=([QRBN])/, (_, c) => '=' + FIG[c]);
