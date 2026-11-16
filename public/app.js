@@ -582,6 +582,10 @@ function tryUserMove(from, to) {
 }
 
 boardEl.addEventListener('contextmenu', e => e.preventDefault());
+// Bazı telefon tarayıcıları (iOS Safari) touch-action'ı her zaman uygulamıyor: tahtadaki tek parmak sayfayı kaydırmasın
+{ const stop = e => { if (e.touches.length === 1) e.preventDefault(); };
+  boardEl.addEventListener('touchstart', stop, { passive: false });
+  boardEl.addEventListener('touchmove', stop, { passive: false }); }
 boardEl.addEventListener('pointerdown', e => {
   const sq = sqFromPoint(e.clientX, e.clientY);
   if (sq < 0) return;

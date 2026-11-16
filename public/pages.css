@@ -313,3 +313,9 @@
 .board.rot .pcw svg, .tt-rot .drag-ghost svg, .tt-rot .promo svg { transform: rotate(180deg); }
 .game.tabletop #barTop { transform: rotate(180deg); }
 @media (prefers-reduced-motion: reduce) { .pcw svg { transition: none; } }
+
+/* ----- Telefonda dokunma: tahtada sayfa kaymasın, uzun basınca menü açılmasın ----- */
+html, body { overscroll-behavior-y: none; }
+.mini-board, .board { touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+.look-preview .mini-board { pointer-events: none; }
+button, .btn, .tab, .chip, .node, .pz-card, .hcard { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }

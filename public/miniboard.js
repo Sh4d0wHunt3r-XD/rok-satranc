@@ -1,4 +1,4 @@
-/* Rok Satranç — Dersler ve açılışlar için küçük, tıklamayla oynanan tahta */
+/* Rok Satranç — Dersler ve açılışlar için küçük tahta: dokunarak ya da sürükleyerek oynanır */
 const sqIdx = n => (8 - Number(n[1])) * 8 + 'abcdefgh'.indexOf(n[0]);
 const uciOf = m => Chess.sqName(m.from) + Chess.sqName(m.to) + (m.promotion || '');
 const STAR_SVG = '<svg viewBox="0 0 24 24" class="mb-star"><path d="M12 2.8l2.7 5.8 6.3.7-4.7 4.3 1.3 6.2L12 16.7l-5.6 3.1 1.3-6.2L3 9.3l6.3-.7z"/></svg>';
@@ -12,12 +12,77 @@ class MiniBoard {
     this.last = []; this.stars = new Set(); this.marks = {}; this.arrows = [];
     this.legal = () => [];        // kare -> hedef kareler
     this.onMove = null;           // (from, to) => void
+    this.drag = null; this.ghost = null;
     el.classList.add('mini-board');
-    el.addEventListener('click', e => {
-      const s = e.target.closest('[data-sq]');
-      if (s) this.click(Number(s.dataset.sq));
-    });
+    // Dokunmatik ekranda tahtaya değen parmak sayfayı kaydırmasın
+    const stop = e => { if (e.touches.length === 1) e.preventDefault(); };
+    el.addEventListener('touchstart', stop, { passive: false });
+    el.addEventListener('touchmove', stop, { passive: false });
+    el.addEventListener('contextmenu', e => e.preventDefault());
+    el.addEventListener('pointerdown', e => this.down(e));
+    el.addEventListener('pointermove', e => this.move(e));
+    el.addEventListener('pointerup', e => this.up(e));
+    el.addEventListener('pointercancel', () => { this.drag = null; this.endGhost(); this.render(); });
   }
+  sqAtPoint(x, y) {
+    const r = this.el.getBoundingClientRect();
+    const c = Math.floor((x - r.left) / r.width * 8), w = Math.floor((y - r.top) / r.height * 8);
+    if (c < 0 || c > 7 || w < 0 || w > 7) return -1;
+    const d = w * 8 + c;
+    return this.orient === 'w' ? d : 63 - d;
+  }
+  down(e) {
+    if (e.button !== 0) return;
+    const sq = this.sqAtPoint(e.clientX, e.clientY);
+    if (sq < 0) return;
+    try { this.el.setPointerCapture(e.pointerId); } catch (err) { /* işaretçi yakalanamazsa da çalışır */ }
+    // Seçili taşın gidebileceği kareye basıldıysa ya da sürüklenecek taş yoksa: dokunma gibi davran
+    const canDrag = this.b[sq] && !(this.sel != null && this.targets.includes(sq)) && this.legal(sq).length;
+    if (!canDrag) { this.drag = { from: sq, x: e.clientX, y: e.clientY, tap: true }; return; }
+    const wasSel = this.sel === sq;
+    if (!wasSel) { this.sel = sq; this.targets = this.legal(sq); this.render(); }
+    this.drag = { from: sq, x: e.clientX, y: e.clientY, wasSel, moved: false };
+  }
+  move(e) {
+    const d = this.drag;
+    if (!d || d.tap) return;
+    if (!d.moved && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 5) {
+      d.moved = true;
+      const size = this.el.getBoundingClientRect().width / 8;
+      this.ghost = document.createElement('div');
+      this.ghost.className = 'drag-ghost';
+      this.ghost.style.width = this.ghost.style.height = size + 'px';
+      this.ghost.innerHTML = pieceSVG(this.b[d.from]);
+      document.body.append(this.ghost);
+      const src = this.el.querySelector(`[data-sq="${d.from}"] .mb-pc`);
+      if (src) src.style.opacity = '.25';
+    }
+    if (d.moved && this.ghost) {
+      const size = parseFloat(this.ghost.style.width);
+      this.ghost.style.left = (e.clientX - size / 2) + 'px';
+      this.ghost.style.top = (e.clientY - size / 2) + 'px';
+    }
+  }
+  up(e) {
+    const d = this.drag;
+    this.drag = null;
+    if (!d) return;
+    const sq = this.sqAtPoint(e.clientX, e.clientY);
+    if (d.tap) { if (sq === d.from) this.click(sq); return; }
+    this.endGhost();
+    if (d.moved) {
+      if (sq >= 0 && sq !== d.from && this.targets.includes(sq)) {
+        const from = this.sel;
+        this.sel = null; this.targets = [];
+        if (this.onMove) this.onMove(from, sq);
+        return;
+      }
+      this.render();
+      return;
+    }
+    if (d.wasSel) { this.sel = null; this.targets = []; this.render(); } // seçili taşa tekrar dokunmak seçimi kaldırır
+  }
+  endGhost() { if (this.ghost) { this.ghost.remove(); this.ghost = null; } }
   setBoard(b) { this.b = b.slice(); this.sel = null; this.targets = []; this.render(); }
   setChess(ch) { this.setBoard(ch.b.map(p => p || '')); }
   click(sq) {
