@@ -1,0 +1,37 @@
+ROK SATRANÇ
+===========
+
+AÇMAK
+  baslat.bat dosyasına çift tıkla. Siyah bir pencere açılır ve oyun
+  tarayıcıda başlar. Oynadığın sürece o siyah pencereyi kapatma.
+  Bilgisayarda Node.js kurulu olmalı (https://nodejs.org).
+
+ARKADAŞLA OYNAMAK (Radmin VPN)
+  1. İkiniz de Radmin VPN'de aynı ağa girin.
+  2. Sen baslat.bat ile Rok'u aç. Siyah pencerede "Arkadaşına ver"
+     satırında bir adres yazar, örneğin: http://26.x.x.x:3000
+  3. "Arkadaşla" bölümünde oda kur.
+  4. Arkadaşın o adresi kendi tarayıcısında açar, "Arkadaşla" bölümünde
+     odanı görür ve "Katıl"a basar. Onun hiçbir şey kurmasına gerek yok.
+
+  Arkadaşın bağlanamıyorsa:
+  - İlk açılışta Windows Güvenlik Duvarı izin sorar. "Özel ağlar"
+    kutusunu işaretleyip izin vermiş olman gerekir.
+  - Sonradan izin vermek için: Başlat > "Güvenlik Duvarı üzerinden
+    uygulamaya izin ver" > Node.js'i bul > "Özel" kutusunu işaretle.
+  - Radmin VPN'de ikinizin de bağlı (yeşil) göründüğünü kontrol et.
+
+KISAYOLLAR (oyun ekranında)
+  Sol / sağ ok   hamleler arasında geri / ileri git
+  F              tahtayı çevir
+  Sağ tık        kareyi işaretle; sürükleyerek ok çiz
+
+KAYITLAR
+  Puanların, oyun geçmişin ve ayarların tarayıcıda saklanır. Aynı
+  tarayıcıyla açtığın sürece kaybolmaz.
+
+TEŞEKKÜRLER
+  Motor: Stockfish 19 (Stockfish.js, GPLv3) - public/stockfish/Copying.txt
+  Taşlar: cburnett seti, Colin M.L. Burnett (GPLv2+)
+  Bulmacalar: Lichess açık bulmaca veritabanı (CC0)
+  Yazı tipleri: Archivo ve JetBrains Mono (SIL Open Font License)

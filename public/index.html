@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rok Satranç</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23ece4d6'/%3E%3Cpath d='M4 3h2v2h1V3h2v2h1V3h2v4l-1 1v4h1v2H4v-2h1V8L4 7z' fill='%23181613'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body>
+
+<!-- İkonlar -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-bot" viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="12" rx="3"/><path d="M12 3v4M9.5 12.5h.01M14.5 12.5h.01M9.5 16h5"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.6"/><path d="M17.2 14.2c2.4.2 4.3 2.2 4.3 4.8"/></symbol>
+    <symbol id="i-board" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 12h17M12 3.5v17"/><path d="M3.5 3.5h8.5v8.5H3.5zM12 12h8.5v8.5H12z" fill="currentColor" stroke="none" opacity=".35"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 11L12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5.5h4V20"/></symbol>
+    <symbol id="i-cap" viewBox="0 0 24 24"><path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.5 11.5V16c1.5 1.6 3.4 2.5 5.5 2.5s4-.9 5.5-2.5v-4.5"/><path d="M21.5 9.5V15"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5C6.5 4.5 9.5 4.5 12 6c2.5-1.5 5.5-1.5 8 -.5V19c-2.5-1-5.5-1-8 .5-2.5-1.5-5.5-1.5-8-.5z"/><path d="M12 6v13.5"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21c-3.6 0-6.5-2.6-6.5-6.2 0-3.3 2.3-5.3 3.6-7.4.4 1.9 1.4 3 2.4 3.5C11.8 7.6 13 5 15.6 3c-.3 2.9 3 5.3 3 10 0 4.6-3 8-6.6 8z"/><path d="M12 21c-1.6 0-2.8-1.2-2.8-2.9 0-1.9 1.6-2.8 2.4-4.3.9 1.2 3.2 2.4 3.2 4.4 0 1.6-1.2 2.8-2.8 2.8z"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".6" fill="currentColor"/></symbol>
+    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+    <symbol id="i-first" viewBox="0 0 24 24"><path d="M17 6l-6 6 6 6M7 6v12"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-last" viewBox="0 0 24 24"><path d="M7 6l6 6-6 6M17 6v12"/></symbol>
+    <symbol id="i-flip" viewBox="0 0 24 24"><path d="M7 20V4M4 7l3-3 3 3M17 4v16M14 17l3 3 3-3"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.8 10.6c.6.6.8 1.3.8 2.4h6c0-1.1.2-1.8.8-2.4A6 6 0 0 0 12 3z"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h12l-2.5 4.5L17 13H5"/></symbol>
+    <symbol id="i-half" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17" /><path d="M12 3.5a8.5 8.5 0 0 0 0 17z" fill="currentColor" stroke="none" opacity=".45"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M20 20l-5-5"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H6.5v18h11V6.5z"/><path d="M14 3v3.5h3.5M9.5 12.5h5M9.5 16h5"/></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M17 3l3.5 3.5L17 10"/><path d="M3.5 12V10a3.5 3.5 0 0 1 3.5-3.5h13.5"/><path d="M7 21l-3.5-3.5L7 14"/><path d="M20.5 12v2a3.5 3.5 0 0 1-3.5 3.5H3.5"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-5 16-3.5-6.5z"/><path d="M11.5 13.5L20 4"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></symbol>
+    <symbol id="i-signal" viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0M8 15.5a5.5 5.5 0 0 1 8 0"/><circle cx="12" cy="19" r="1" fill="currentColor"/></symbol>
+  </defs>
+</svg>
+
+<!-- ============ ANA MENÜ ============ -->
+<section id="home" class="screen">
+  <div class="shell">
+    <aside class="rail">
+      <div class="brand"><span class="brand-word">ROK</span><span class="brand-sub">satranç</span></div>
+      <nav class="tabs" role="tablist" aria-label="Bölümler">
+        <button class="tab active" data-tab="home" role="tab"><svg class="ic"><use href="#i-home"/></svg><span>Ana sayfa</span></button>
+        <span class="nav-head">Oyna</span>
+        <button class="tab" data-tab="bot" role="tab"><svg class="ic"><use href="#i-bot"/></svg><span>Bota karşı</span></button>
+        <button class="tab" data-tab="online" role="tab"><svg class="ic"><use href="#i-users"/></svg><span>Arkadaşla</span><em>Radmin</em></button>
+        <button class="tab" data-tab="local" role="tab"><svg class="ic"><use href="#i-board"/></svg><span>Aynı bilgisayarda</span></button>
+        <span class="nav-head">Çalış</span>
+        <button class="tab" data-tab="puzzles" role="tab"><svg class="ic"><use href="#i-target"/></svg><span>Bulmacalar</span></button>
+        <button class="tab" data-tab="learn" role="tab"><svg class="ic"><use href="#i-cap"/></svg><span>Öğren</span></button>
+        <button class="tab" data-tab="openings" role="tab"><svg class="ic"><use href="#i-book"/></svg><span>Açılışlar</span></button>
+        <button class="tab" data-tab="tools" role="tab"><svg class="ic"><use href="#i-pulse"/></svg><span>Analiz</span></button>
+        <span class="nav-head">Sen</span>
+        <button class="tab" data-tab="history" role="tab"><svg class="ic"><use href="#i-chart"/></svg><span>İstatistik</span></button>
+      </nav>
+      <div class="rail-foot">
+        <div class="me-chip" id="meChip"></div>
+        <button class="tab plain" id="openSettings"><svg class="ic"><use href="#i-sliders"/></svg><span>Ayarlar</span></button>
+      </div>
+    </aside>
+
+    <main class="stage">
+      <!-- Ana sayfa / Öğren / Açılışlar (home.js, learn.js, openings.js doldurur) -->
+      <div class="tab-pane wide" id="pane-home"></div>
+      <div class="tab-pane wide" id="pane-learn" hidden></div>
+      <div class="tab-pane wide" id="pane-openings" hidden></div>
+
+      <!-- Bot -->
+      <div class="tab-pane" id="pane-bot" hidden>
+        <header class="pane-head">
+          <h1>Bota karşı</h1>
+          <p>Sekiz rakip: beşi yerleşik motorla, en güçlü üçü Stockfish ile oynar. Kazandıkça puanın yükselir.</p>
+        </header>
+        <div class="split">
+          <div class="bot-list" id="botGrid"></div>
+          <div class="setup">
+            <div class="field">
+              <span class="label">Rengin</span>
+              <div class="color-pick" id="botColor">
+                <button data-v="w"><span class="cp-ico" data-piece="wK"></span>Beyaz</button>
+                <button data-v="r" class="on"><span class="cp-ico cp-mix"><span data-piece="wK"></span><span data-piece="bK"></span></span>Rastgele</button>
+                <button data-v="b"><span class="cp-ico" data-piece="bK"></span>Siyah</button>
+              </div>
+            </div>
+            <div class="field"><span class="label">Süre</span><div class="time-picker" id="botTime"></div></div>
+            <button class="btn primary big" id="startBot"><svg class="ic"><use href="#i-play"/></svg>Oyunu başlat</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Online -->
+      <div class="tab-pane" id="pane-online" hidden>
+        <header class="pane-head">
+          <h1>Arkadaşla</h1>
+          <p>Radmin VPN ya da aynı ev ağı üzerinden. Arkadaşının bir şey kurmasına gerek yok.</p>
+        </header>
+        <div class="addr-card" id="addrCard">Adresler yükleniyor…</div>
+        <div class="split">
+          <div class="block">
+            <h2>Açık odalar</h2>
+            <div id="roomList" class="room-list"><p class="muted">Henüz oda yok.</p></div>
+            <div class="join-code">
+              <input id="codeInput" maxlength="5" placeholder="ODA KODU" autocomplete="off" aria-label="Oda kodu">
+              <button class="btn" id="joinCode">Katıl</button>
+            </div>
+          </div>
+          <div class="setup">
+            <h2>Oda kur</h2>
+            <div class="field">
+              <label class="label" for="nameInput">Adın</label>
+              <input id="nameInput" maxlength="24" placeholder="Örn. Kaan" autocomplete="off">
+            </div>
+            <div class="field">
+              <span class="label">Rengin</span>
+              <div class="color-pick" id="roomColor">
+                <button data-v="w"><span class="cp-ico" data-piece="wK"></span>Beyaz</button>
+                <button data-v="r" class="on"><span class="cp-ico cp-mix"><span data-piece="wK"></span><span data-piece="bK"></span></span>Rastgele</button>
+                <button data-v="b"><span class="cp-ico" data-piece="bK"></span>Siyah</button>
+              </div>
+            </div>
+            <div class="field"><span class="label">Süre</span><div class="time-picker" id="roomTime"></div></div>
+            <button class="btn primary big" id="createRoom"><svg class="ic"><use href="#i-plus"/></svg>Oda kur</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Local -->
+      <div class="tab-pane" id="pane-local" hidden>
+        <header class="pane-head">
+          <h1>Aynı bilgisayarda</h1>
+          <p>İki kişi, tek tahta. Sırası gelen oynar. Tahtanın her hamlede dönmesini Ayarlar'dan açabilirsin.</p>
+        </header>
+        <div class="setup narrow">
+          <div class="field"><span class="label">Süre</span><div class="time-picker" id="localTime"></div></div>
+          <button class="btn primary big" id="startLocal"><svg class="ic"><use href="#i-play"/></svg>Oyunu başlat</button>
+        </div>
+      </div>
+
+      <!-- Bulmacalar -->
+      <div class="tab-pane" id="pane-puzzles" hidden></div>
+
+      <!-- Analiz ve araçlar -->
+      <div class="tab-pane" id="pane-tools" hidden>
+        <header class="pane-head">
+          <h1>Analiz</h1>
+          <p>Pozisyonları incele, kendi dizilişini kur ya da başka bir yerden oyun getir.</p>
+        </header>
+        <div class="tool-row">
+          <button class="tool" id="openAnalysis">
+            <svg class="ic big"><use href="#i-pulse"/></svg>
+            <span class="tool-t">Analiz tahtası</span>
+            <span class="tool-d">İki taraf için serbestçe oyna. Motor her pozisyonu değerlendirir.</span>
+          </button>
+          <button class="tool" id="openEditor">
+            <svg class="ic big"><use href="#i-edit"/></svg>
+            <span class="tool-t">Tahta düzenleyici</span>
+            <span class="tool-d">İstediğin pozisyonu kur. Analiz et ya da bota karşı oyna.</span>
+          </button>
+        </div>
+        <div class="block">
+          <h2>PGN veya FEN yükle</h2>
+          <textarea id="importText" rows="6" placeholder='[Event "..."]&#10;1. e4 e5 2. Nf3 Nc6 3. Bb5 ...'></textarea>
+          <div class="row-gap"><button class="btn primary" id="importAnalyse">Analiz et</button><button class="btn" id="importReview"><svg class="ic"><use href="#i-search"/></svg>Oyunu incele</button></div>
+        </div>
+      </div>
+
+      <!-- Geçmiş -->
+      <div class="tab-pane" id="pane-history" hidden></div>
+    </main>
+  </div>
+</section>
+
+<!-- ============ OYUN ============ -->
+<section id="game" class="screen" hidden>
+  <div class="game">
+    <div class="board-col">
+      <div class="player-bar" id="barTop"></div>
+      <div class="board-wrap">
+        <div id="evalBar" class="eval-bar" hidden><div class="eval-fill"></div><span class="eval-num"></span></div>
+        <div id="board" class="board"></div>
+        <svg id="arrows" class="arrows" viewBox="0 0 800 800" aria-hidden="true"></svg>
+        <div id="promo" class="promo" hidden></div>
+        <div id="waitBanner" class="wait-banner" hidden></div>
+        <div id="pzFlash" class="pz-flash" hidden></div>
+      </div>
+      <div class="player-bar" id="barBottom"></div>
+    </div>
+
+    <aside class="side">
+      <div class="side-head">
+        <button class="icon-btn" id="backHome" title="Menüye dön" aria-label="Menüye dön"><svg class="ic"><use href="#i-back"/></svg></button>
+        <div class="side-title">
+          <div class="mode-label" id="modeLabel"></div>
+          <div class="opening" id="opening"></div>
+        </div>
+      </div>
+      <div class="notice" id="notice" hidden></div>
+      <div class="xpanel" id="xpanel" hidden></div>
+      <div class="moves" id="moves"></div>
+      <div class="nav-row">
+        <button class="nav-btn" data-nav="first" title="Başa" aria-label="Başa"><svg class="ic"><use href="#i-first"/></svg></button>
+        <button class="nav-btn" data-nav="prev" title="Geri (←)" aria-label="Geri"><svg class="ic"><use href="#i-prev"/></svg></button>
+        <button class="nav-btn" data-nav="next" title="İleri (→)" aria-label="İleri"><svg class="ic"><use href="#i-next"/></svg></button>
+        <button class="nav-btn" data-nav="last" title="Son hamle" aria-label="Son hamle"><svg class="ic"><use href="#i-last"/></svg></button>
+      </div>
+      <div class="actions" id="actions"></div>
+      <div class="chat" id="chat" hidden>
+        <div class="chat-log" id="chatLog"></div>
+        <form class="chat-form" id="chatForm">
+          <input id="chatInput" maxlength="300" placeholder="Mesaj yaz" autocomplete="off" aria-label="Mesaj">
+          <button class="icon-btn" aria-label="Gönder"><svg class="ic"><use href="#i-send"/></svg></button>
+        </form>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ TAHTA DÜZENLEYİCİ ============ -->
+<section id="editor" class="screen" hidden>
+  <div class="game">
+    <div class="board-col">
+      <div class="palette" id="palTop"></div>
+      <div class="board-wrap"><div id="edBoard" class="board"></div></div>
+      <div class="palette" id="palBottom"></div>
+    </div>
+    <aside class="side ed-side">
+      <div class="side-head">
+        <button class="icon-btn" id="edBack" title="Menüye dön" aria-label="Menüye dön"><svg class="ic"><use href="#i-back"/></svg></button>
+        <div class="side-title"><div class="mode-label">Tahta düzenleyici</div><div class="opening">Taş seç, karelere tıkla. Sağ tık kareyi boşaltır.</div></div>
+      </div>
+      <div class="ed-body">
+        <div class="field"><span class="label">Sıra</span>
+          <div class="seg" id="edTurn"><button data-v="w" class="on">Beyaz</button><button data-v="b">Siyah</button></div></div>
+        <div class="field"><span class="label">Rok hakları</span>
+          <div class="ed-castle">
+            <label class="toggle"><input type="checkbox" id="edK" checked><span>Beyaz kısa</span></label>
+            <label class="toggle"><input type="checkbox" id="edQ" checked><span>Beyaz uzun</span></label>
+            <label class="toggle"><input type="checkbox" id="edk" checked><span>Siyah kısa</span></label>
+            <label class="toggle"><input type="checkbox" id="edq" checked><span>Siyah uzun</span></label>
+          </div></div>
+        <div class="field"><label class="label" for="edFen">FEN</label><input id="edFen" class="mono" autocomplete="off" spellcheck="false"></div>
+        <div class="row-gap">
+          <button class="btn small" id="edStart">Başlangıç dizilişi</button>
+          <button class="btn small" id="edClear">Temizle</button>
+          <button class="btn small ghost" id="edFlip"><svg class="ic"><use href="#i-flip"/></svg>Çevir</button>
+        </div>
+        <div class="ed-error" id="edError"></div>
+        <div class="row-gap">
+          <button class="btn primary" id="edAnalyse">Analiz et</button>
+          <button class="btn" id="edPlay"><svg class="ic"><use href="#i-bot"/></svg>Bota karşı oyna</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ PENCERELER ============ -->
+<div class="modal-back" id="resultModal" hidden>
+  <div class="modal result">
+    <div class="result-title" id="resTitle"></div>
+    <div class="result-reason" id="resReason"></div>
+    <div class="result-extra" id="resExtra"></div>
+    <div class="modal-actions" id="resActions"></div>
+  </div>
+</div>
+
+<div class="modal-back" id="settingsModal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h3>Ayarlar</h3><button class="icon-btn" id="closeSettings" aria-label="Kapat"><svg class="ic"><use href="#i-x"/></svg></button></div>
+    <div class="settings-list">
+      <label class="toggle"><input type="checkbox" id="setSound"><span>Sesler</span></label>
+      <label class="toggle"><input type="checkbox" id="setLegal"><span>Gidilebilecek kareleri göster</span></label>
+      <label class="toggle"><input type="checkbox" id="setCoords"><span>Koordinatları göster</span></label>
+      <label class="toggle"><input type="checkbox" id="setAutoQueen"><span>Piyonu otomatik vezir yap</span></label>
+      <label class="toggle"><input type="checkbox" id="setPremove"><span>Ön hamleye izin ver</span></label>
+      <label class="toggle"><input type="checkbox" id="setFlip"><span>Aynı bilgisayarda tahtayı her hamlede döndür</span></label>
+    </div>
+    <h4 class="set-head">Görünüm</h4>
+    <div class="field"><span class="label">Tahta</span><div class="themes" id="themes"></div></div>
+    <div class="look-opts" id="lookOpts"></div>
+    <p class="credit">Taşlar: cburnett seti, Colin M.L. Burnett (GPLv2+). Bulmacalar: Lichess açık veritabanı (CC0). Motor: Stockfish 19 (Stockfish.js, GPLv3).</p>
+  </div>
+</div>
+
+<div class="modal-back" id="pgnModal" hidden>
+  <div class="modal wide">
+    <div class="modal-head"><h3>Dışa aktar</h3><button class="icon-btn" id="closePgn" aria-label="Kapat"><svg class="ic"><use href="#i-x"/></svg></button></div>
+    <div class="field"><span class="label">PGN</span><textarea id="pgnOut" rows="9" readonly></textarea></div>
+    <div class="field"><span class="label">Bu pozisyon (FEN)</span><input id="fenOut" class="mono" readonly></div>
+    <div class="modal-actions">
+      <button class="btn" id="copyFen"><svg class="ic"><use href="#i-copy"/></svg>FEN'i kopyala</button>
+      <button class="btn primary" id="copyPgn"><svg class="ic"><use href="#i-copy"/></svg>PGN'i kopyala</button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="pieces.js"></script>
+<script src="chess.js"></script>
+<script src="sf.js"></script>
+<script src="app.js"></script>
+<script src="extra.js"></script>
+<script src="drill.js"></script>
+<script src="miniboard.js"></script>
+<script src="pzplus.js"></script>
+<script src="learn.js"></script>
+<script src="openings.js"></script>
+<script src="home.js"></script>
+<script src="coach.js"></script>
+<script src="look.js"></script>
+</body>
+</html>
