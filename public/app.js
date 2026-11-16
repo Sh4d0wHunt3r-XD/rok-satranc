@@ -316,6 +316,7 @@ function userMove(from, to, promotion) {
   const res = applyMove({ from, to, promotion });
   if (!res) return;
   clockAfterMove(res.color);
+  if (G.mode === 'net') Net.sendMove(res);
   if (checkEnd()) return;
   if (G.mode === 'local' && settings.hotseatFlip && !settings.tabletop) G.orient = G.chess.turn;
   render();
@@ -699,6 +700,7 @@ function playerInfo(color) {
   const ex = Extra.playerInfo(color);
   if (ex) return ex;
   if (Drill.on()) return Drill.playerInfo(color);
+  if (G.mode === 'net') return Net.playerInfo(color);
   const king = { svg: pieceSVG(color === 'w' ? 'K' : 'k'), bg: '#2f2b25' };
   if (G.mode === 'bot') {
     if (color === G.my) return Object.assign({ name: 'Sen', elo: rating() }, king);
@@ -886,8 +888,10 @@ function renderSide() {
     } else {
       add(s.rematch && s.rematch[G.my] ? 'Rövanş istendi…' : 'Rövanş', () => Online.send({ type: 'rematch' }), 'primary').disabled = !!(s.rematch && s.rematch[G.my]);
     }
-  } else Extra.actions(add);
+  } else if (G.mode === 'net') Net.actions(add);
+  else Extra.actions(add);
   if (G.over && G.moves.length && G.mode !== 'analysis' && G.mode !== 'puzzle') add('Oyunu incele', () => Review.fromCurrent());
+  if (G.mode !== 'puzzle' && G.moves.length) add('Paylaş', () => Share.shareGame(), 'ghost');
   if (G.mode !== 'puzzle') add('PGN', () => PGN.showExport(), 'ghost');
   add('Tahtayı çevir', flip, 'ghost');
 
@@ -906,6 +910,7 @@ function renderSide() {
   if (G.view != null && G.mode !== 'analysis') nh += `<div>Eski bir pozisyona bakıyorsun.</div><div class="row"><button class="btn small" data-live="1">Son pozisyona dön</button></div>`;
   if (Drill.on()) nh = Drill.notice() + nh;
   if (Coach.active()) nh = Coach.notice() + nh;
+  if (G.mode === 'net') nh = Net.notice() + nh;
   n.innerHTML = nh;
   n.hidden = !nh;
 
@@ -917,7 +922,8 @@ function renderSide() {
     wb.hidden = false;
   } else wb.hidden = true;
 
-  $('#chat').hidden = G.mode !== 'online';
+  $('#chat').hidden = G.mode !== 'online' && G.mode !== 'net';
+  if (G.mode === 'net') Net.renderChat();
 }
 $('#notice').addEventListener('click', e => {
   const b = e.target.closest('button');
@@ -1129,6 +1135,7 @@ $('#chatForm').addEventListener('submit', e => {
   const i = $('#chatInput'), text = i.value.trim();
   if (!text) return;
   i.value = '';
+  if (G.mode === 'net') { Net.chatSend(text); return; }
   Online.send({ type: 'chat', text });
 });
 
@@ -1138,6 +1145,8 @@ function showScreen(id) {
   if (id === 'home') { renderMe(); renderBots(); }
 }
 function goHome() {
+  if (G.mode === 'net' && !G.over && G.moves.length && !confirm('Oyundan çıkarsan teslim olmuş sayılırsın. Çıkılsın mı?')) return;
+  if (G.mode === 'net') { if (!G.over && G.moves.length) Net.resign(); Net.leave(); }
   stopBot();
   if (G.mode === 'online') Online.leave();
   Extra.leaveMode();

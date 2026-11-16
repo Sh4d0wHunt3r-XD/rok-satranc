@@ -19,7 +19,7 @@ const BADGES = [
   { id: 'hata10', n: 'Hata avcısı', d: 'Kendi hatalarından 10 tanesini öğren', t: s => s.mistSolved >= 10 },
   { id: 'koord20', n: 'Keskin göz', d: 'Koordinat oyununda 20 kare bul', t: s => s.coord >= 20 },
   { id: 'usta70', n: 'Usta gibi düşün', d: 'Bir ustanın oyununda hamlelerin %70\'ini bul', t: s => s.master >= 70 },
-  { id: 'cc5', n: 'Dedektif', d: '5 Chess.com oyununu incele', t: s => s.ccReviewed >= 5 }
+  { id: 'cc5', n: 'Dedektif', d: '5 Chess.com ya da Lichess oyununu incele', t: s => s.ccReviewed >= 5 }
 ];
 
 const Achievements = {
@@ -39,7 +39,7 @@ const Achievements = {
       mistSolved: store.get('mistSolved', 0),
       coord: Math.max(0, ...Object.values(store.get('coordBest', {}))),
       master: Math.max(0, ...Object.values(store.get('masterBest', {}))),
-      ccReviewed: h.filter(e => e.mode === 'chesscom' && e.acc != null).length
+      ccReviewed: h.filter(e => (e.mode === 'chesscom' || e.mode === 'lichess') && e.acc != null).length
     };
   },
   unlocked() { return store.get('badges', null); },

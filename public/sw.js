@@ -1,10 +1,10 @@
 /* Rok Satranç — servis çalışanı: internetsiz de açılır, internet varken her zaman son sürümü getirir.
    Yeni sürüm yayınlarken VERSION'ı (ve pwa.js'teki APP_VERSION'ı) artır. */
-const VERSION = 'rok-v7';
+const VERSION = 'rok-v8';
 const FILES = [
   './', 'index.html', 'style.css', 'pages.css', 'manifest.webmanifest',
   'pieces.js', 'chess.js', 'sf.js', 'app.js', 'bots.js', 'extra.js', 'drill.js', 'miniboard.js', 'pzplus.js', 'learn.js',
-  'openings.js', 'home.js', 'coach.js', 'look.js', 'chesscom.js', 'train.js', 'achievements.js', 'pwa.js', 'engine.js',
+  'openings.js', 'home.js', 'coach.js', 'look.js', 'chesscom.js', 'train.js', 'achievements.js', 'share.js', 'backup.js', 'net.js', 'pwa.js', 'engine.js',
   'puzzles.json', 'stockfish/stockfish-19-lite-single.js', 'stockfish/stockfish-19-lite-single.wasm',
   'fonts/archivo-latin-ext.woff2', 'fonts/archivo-latin.woff2', 'fonts/jbmono-latin-ext.woff2', 'fonts/jbmono-latin.woff2',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png', 'icons/apple-180.png'

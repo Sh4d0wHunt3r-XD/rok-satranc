@@ -1,7 +1,7 @@
 /* Rok Satranç — Telefona kurulabilir sürüm ve sunucusuz çalışma.
    GitHub Pages gibi bir siteden açıldığında sunucu yoktur: online oda kurma kapanır, geri kalan her şey telefonun içinde çalışır. */
 var NO_SERVER = location.protocol === 'file:' || (location.protocol === 'https:' && !/^(localhost|127\.|\d+\.\d+\.\d+\.\d+$)/.test(location.hostname));
-const APP_VERSION = 'rok-v7'; // sw.js'teki VERSION ile aynı olmalı
+const APP_VERSION = 'rok-v8'; // sw.js'teki VERSION ile aynı olmalı
 
 const Pwa = {
   prompt: null, pendingReload: false,
@@ -40,11 +40,7 @@ const Pwa = {
   },
   noServer() {
     const pane = $('#pane-online');
-    pane.innerHTML = `<header class="pane-head"><h1>Arkadaşla</h1><p>Online oda kurmak için Rok'un bilgisayarda açık olması gerekiyor.</p></header>
-      <div class="block" style="max-width:640px">
-        <p>Bu sürüm internetten açıldığı için her şey senin cihazında çalışıyor: botlar, bulmacalar, dersler, analiz. Sadece arkadaşla online oyun için bir sunucu lazım.</p>
-        <p class="muted">Arkadaşınla oynamak için bilgisayarda <b>baslat.bat</b> ile Rok'u aç ve "Arkadaşla" bölümünü oradan kullan. Aynı cihazda iki kişi oynamak için "Aynı bilgisayarda" bölümü burada da çalışır.</p>
-      </div>`;
+    pane.innerHTML = `<header class="pane-head"><h1>Arkadaşla</h1><p>İnternetten, arkadaşın nerede olursa olsun oynayabilirsin. Aynı odada tek cihazla oynamak için "Aynı bilgisayarda" bölümünü kullan.</p></header>`;
     const em = $('.tab[data-tab="online"] em'); if (em) em.remove();
   }
 };

@@ -122,7 +122,7 @@ const Weekly = {
     const since = Date.now() - 7 * 864e5, a = Activity.all(), sum = { pz: 0, ls: 0, gm: 0, op: 0, dr: 0 };
     for (const [k, v] of Object.entries(a)) if (Date.parse(k + 'T12:00:00') >= since - 864e5) for (const x in v) sum[x] = (sum[x] || 0) + v[x];
     const delta = (hist, cur) => { const before = hist.filter(h => h[0] < since); const base = before.length ? before[before.length - 1][1] : (hist.find(h => h[0] >= since) || [0, cur])[1]; return cur - base; };
-    const games = History.list().filter(e => e.ts >= since && e.my && ['bot', 'online', 'chesscom'].includes(e.mode));
+    const games = History.list().filter(e => e.ts >= since && e.my && ['bot', 'online', 'chesscom', 'lichess', 'net'].includes(e.mode));
     const t = { win: 0, draw: 0, loss: 0 }; games.forEach(e => t[History.outcome(e)]++);
     const rev = games.filter(e => e.acc != null);
     const fails = {};

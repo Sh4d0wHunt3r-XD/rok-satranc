@@ -591,7 +591,7 @@ const History = {
   list() { return store.get('history', []); },
   save() {
     if (G.saved || !G.over || G.over.reason === 'abort' || !G.moves.length) return;
-    if (!['bot', 'local', 'online'].includes(G.mode)) return;
+    if (!['bot', 'local', 'online', 'net'].includes(G.mode)) return;
     if (G.mode === 'online' && !G.my) return;
     G.saved = true;
     const name = c => playerInfo(c).name.replace(' (sen)', '');
@@ -642,8 +642,9 @@ const History = {
         <div class="stat"><span class="label">Bot puanı</span><div class="v">${rating()}</div><div class="sub">${store.get('games', 0)} bot oyunu</div></div>
         <div class="stat"><span class="label">Bulmaca puanı</span><div class="v">${Puzzle.rating()}</div><div class="sub">${(s => `${s.ok} / ${s.ok + s.fail} çözüldü`)(store.get('pzStats', { ok: 0, fail: 0 }))}</div></div>
         ${statCard('Botlara karşı', tally(e => e.mode === 'bot'))}
-        ${statCard('Arkadaşlara karşı', tally(e => e.mode === 'online'))}
+        ${statCard('Arkadaşlara karşı', tally(e => e.mode === 'online' || e.mode === 'net'))}
         ${statCard('Chess.com', tally(e => e.mode === 'chesscom'))}
+        ${statCard('Lichess', tally(e => e.mode === 'lichess'))}
       </div>
       <div class="charts">
         <div class="block"><h2>Bot puanı</h2>${this.chart(store.get('ratingHist', []), '#c9a253')}</div>
@@ -663,7 +664,7 @@ const History = {
   },
   // Ayrıntılı istatistikler: renk, açılış, isabet, botlar
   insights(l, tally, statCard) {
-    const mine = l.filter(e => e.my && ['bot', 'online', 'chesscom'].includes(e.mode));
+    const mine = l.filter(e => e.my && ['bot', 'online', 'chesscom', 'lichess', 'net'].includes(e.mode));
     if (!mine.length) return '';
     const wdl = t => { const n = t.win + t.draw + t.loss; return n ? `<div class="wdl"><div class="w" style="width:${t.win / n * 100}%"></div><div class="d" style="width:${t.draw / n * 100}%"></div><div class="l" style="width:${t.loss / n * 100}%"></div></div>` : ''; };
     const groups = new Map();
@@ -682,8 +683,8 @@ const History = {
     return `
       <div class="block"><h2>İstatistikler</h2>
         <div class="stats-row">
-          ${statCard('Beyazla', tally(e => e.my === 'w' && ['bot', 'online', 'chesscom'].includes(e.mode)))}
-          ${statCard('Siyahla', tally(e => e.my === 'b' && ['bot', 'online', 'chesscom'].includes(e.mode)))}
+          ${statCard('Beyazla', tally(e => e.my === 'w' && ['bot', 'online', 'chesscom', 'lichess', 'net'].includes(e.mode)))}
+          ${statCard('Siyahla', tally(e => e.my === 'b' && ['bot', 'online', 'chesscom', 'lichess', 'net'].includes(e.mode)))}
           <div class="stat"><span class="label">Ortalama isabet</span><div class="v">${rev.length ? avg(e => e.acc).toFixed(1) + '%' : '–'}</div><div class="sub">${rev.length} incelenmiş oyun</div></div>
           <div class="stat"><span class="label">Oyun başına</span><div class="v">${rev.length ? avg(e => (e.cnt && e.cnt.blunder) || 0).toFixed(1) : '–'}</div><div class="sub">büyük hata · ${rev.length ? avg(e => (e.cnt && e.cnt.mistake) || 0).toFixed(1) : '–'} hata · ${rev.length ? avg(e => (e.cnt && e.cnt.inaccuracy) || 0).toFixed(1) : '–'} belirsiz</div></div>
         </div>
@@ -817,6 +818,7 @@ const Extra = {
     if (tab === 'learn') Learn.renderHome();
     if (tab === 'openings') Openings.render();
     if (tab === 'tools') ChessCom.render();
+    if (tab === 'online') Net.renderPane();
     if (tab === 'train') Train.render();
   },
   playerInfo(color) {
@@ -834,6 +836,7 @@ const Extra = {
   },
   modeLabel() {
     if (G.mode === 'analysis') return G.review ? 'Oyun incelemesi' : 'Analiz tahtası';
+    if (G.mode === 'net') return Net.label();
     if (G.mode === 'puzzle' && Puzzle.set && !Puzzle.rush) return PzPlus.label();
     if (G.mode === 'puzzle') return Puzzle.rush ? (Puzzle.rush.kind === 'time' ? 'Bulmaca Yarışı · 3 dakika' : 'Bulmaca Yarışı · Hayatta kal') : (Puzzle.theme ? 'Bulmaca · ' + THEMES_TR[Puzzle.theme] : 'Bulmaca');
     return '';

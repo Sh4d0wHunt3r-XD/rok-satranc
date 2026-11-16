@@ -329,3 +329,12 @@ button, .btn, .tab, .chip, .node, .pz-card, .hcard { touch-action: manipulation;
   inset: 0; border: 0; border-radius: 0;
   background: radial-gradient(circle closest-side, transparent 0 77.5%, rgba(255, 255, 255, .28) 78.5% 80.5%, rgba(24, 20, 14, .58) 81.5% 100%);
 }
+
+/* ----- İnternetten oyun, Lichess etiketi, yedekleme ----- */
+.net-box .net-split { gap: 28px; }
+.net-wait { align-items: flex-start; }
+.net-wait .big-code { font: 800 46px/1 var(--mono); letter-spacing: .14em; color: var(--accent); }
+.g-mode.src-chesscom, .g-mode.src-lichess { font: 800 11px/1 var(--sans); width: 24px; height: 24px; border-radius: 6px; color: #fff; }
+.g-mode.src-chesscom { background: #6a9a3c; }
+.g-mode.src-lichess { background: #5b5b5b; }
+.backup { display: flex; flex-direction: column; gap: 10px; }

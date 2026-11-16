@@ -137,7 +137,7 @@ const Home = {
     const sign = o === 'win' ? '+' : o === 'loss' ? '−' : '=';
     const d = new Date(e.ts);
     return `<div class="grow">
-      <span class="g-mode" title="${MODE_TR[e.mode] || ''}">${icon(e.mode === 'bot' ? 'bot' : e.mode === 'online' || e.mode === 'chesscom' ? 'users' : 'board')}</span>
+      <span class="g-mode" title="${MODE_TR[e.mode] || ''}">${icon(e.mode === 'bot' ? 'bot' : ['online', 'chesscom', 'lichess', 'net'].includes(e.mode) ? 'users' : 'board')}</span>
       <span class="g-opp">${esc(opp)}${elo}<small>${d.toLocaleDateString('tr-TR')} · ${Math.ceil(e.moves.length / 2)} hamle${e.opening ? ' · ' + esc(e.opening) : ''}</small></span>
       <span class="g-acc">${e.acc != null ? e.acc.toFixed(1) + '%' : ''}</span>
       <span class="g-res ${o || 'draw'}">${sign}</span>
