@@ -307,3 +307,9 @@
   .rail { max-width: 100vw; }
   .tabs { min-width: 0; scrollbar-width: thin; }
 }
+
+/* ----- Karşılıklı mod (aynı cihaz) ----- */
+.pcw svg { transition: transform .3s ease; }
+.board.rot .pcw svg, .tt-rot .drag-ghost svg, .tt-rot .promo svg { transform: rotate(180deg); }
+.game.tabletop #barTop { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .pcw svg { transition: none; } }

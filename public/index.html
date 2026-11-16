@@ -153,10 +153,11 @@
       <div class="tab-pane" id="pane-local" hidden>
         <header class="pane-head">
           <h1>Aynı bilgisayarda</h1>
-          <p>İki kişi, tek tahta. Sırası gelen oynar. Tahtanın her hamlede dönmesini Ayarlar'dan açabilirsin.</p>
+          <p>İki kişi, tek tahta. Sırası gelen oynar. Telefonu ya da tableti aranıza koyup karşılıklı oynayabilirsiniz.</p>
         </header>
         <div class="setup narrow">
           <div class="field"><span class="label">Süre</span><div class="time-picker" id="localTime"></div></div>
+          <label class="toggle"><input type="checkbox" id="localTabletop"><span>Karşılıklı mod: cihaz aranızda dururken sırası gelen oyuncunun taşları ona dönük olsun</span></label>
           <button class="btn primary big" id="startLocal"><svg class="ic"><use href="#i-play"/></svg>Oyunu başlat</button>
         </div>
       </div>
@@ -300,6 +301,7 @@
       <label class="toggle"><input type="checkbox" id="setAutoQueen"><span>Piyonu otomatik vezir yap</span></label>
       <label class="toggle"><input type="checkbox" id="setPremove"><span>Ön hamleye izin ver</span></label>
       <label class="toggle"><input type="checkbox" id="setFlip"><span>Aynı bilgisayarda tahtayı her hamlede döndür</span></label>
+      <label class="toggle"><input type="checkbox" id="setTabletop"><span>Karşılıklı mod (aynı cihaz): sırası gelenin taşları ona dönsün</span></label>
     </div>
     <h4 class="set-head">Görünüm</h4>
     <div class="field"><span class="label">Tahta</span><div class="themes" id="themes"></div></div>

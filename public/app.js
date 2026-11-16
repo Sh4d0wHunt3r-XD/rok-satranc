@@ -14,7 +14,7 @@ const THEMES = {
   ceviz: ['#ead7b7', '#b08158', 'Ceviz'], deniz: ['#dfe6ec', '#7b95ab', 'Deniz'], zeytin: ['#e8ead2', '#83935c', 'Zeytin'],
   mermer: ['#e2e0db', '#99958d', 'Mermer'], lavanta: ['#e0d9ea', '#8a7aa8', 'Lavanta'], kiremit: ['#efdccb', '#bc6f52', 'Kiremit']
 };
-const settings = Object.assign({ sound: true, showLegal: true, coords: true, autoQueen: false, premove: true, hotseatFlip: false, theme: 'ceviz' }, store.get('settings', {}));
+const settings = Object.assign({ sound: true, showLegal: true, coords: true, autoQueen: false, premove: true, hotseatFlip: false, theme: 'ceviz', tabletop: matchMedia('(pointer: coarse)').matches }, store.get('settings', {}));
 function applyTheme() {
   const t = THEMES[settings.theme] || THEMES.ceviz;
   document.documentElement.style.setProperty('--light', t[0]);
@@ -317,7 +317,7 @@ function userMove(from, to, promotion) {
   if (!res) return;
   clockAfterMove(res.color);
   if (checkEnd()) return;
-  if (G.mode === 'local' && settings.hotseatFlip) G.orient = G.chess.turn;
+  if (G.mode === 'local' && settings.hotseatFlip && !settings.tabletop) G.orient = G.chess.turn;
   render();
   if (G.mode === 'bot') botMove();
 }
@@ -472,6 +472,15 @@ function viewChess() {
 }
 function render() {
   renderBoard(); renderPlayers(); renderMoves(); renderSide(); Extra.render(); renderArrows();
+  applyTabletop();
+}
+// Karşılıklı mod (aynı cihaz): tahta sabit, sıra üstteki oyuncudaysa taşlar ona dönük çizilir
+function applyTabletop() {
+  const tt = G.mode === 'local' && !!settings.tabletop;
+  const rot = tt && viewChess().turn !== G.orient;
+  boardEl.classList.toggle('rot', rot);
+  document.body.classList.toggle('tt-rot', rot);
+  $('#game .game').classList.toggle('tabletop', tt);
 }
 function renderBoard() {
   const ch = viewChess();
@@ -854,6 +863,7 @@ function renderSide() {
     } else add('Rövanş', rematchBot, 'primary');
   } else if (G.mode === 'local') {
     add('Geri al', undo).disabled = !G.moves.length || (G.over && G.over.reason.startsWith('timeout'));
+    add(settings.tabletop ? 'Karşılıklı: açık' : 'Karşılıklı: kapalı', () => { settings.tabletop = !settings.tabletop; store.set('settings', settings); const b = $('#localTabletop'); if (b) b.checked = settings.tabletop; render(); }, 'ghost');
     if (playing) armButton(add('Teslim ol', null, 'danger'), 'Emin misin?', () => endGame(opp(G.chess.turn), 'resign'));
     else add('Yeni oyun', () => startGame({ mode: 'local', tc: G.tc }), 'primary');
   } else if (G.mode === 'online' && G.my) {
@@ -1161,6 +1171,7 @@ $('#startBot').addEventListener('click', () => {
   if (c === 'r') c = Math.random() < 0.5 ? 'w' : 'b';
   startGame({ mode: 'bot', my: c, bot: botSel, tc: botTime() });
 });
+{ const b = $('#localTabletop'); b.checked = !!settings.tabletop; b.addEventListener('change', e => { settings.tabletop = e.target.checked; store.set('settings', settings); }); }
 $('#startLocal').addEventListener('click', () => startGame({ mode: 'local', tc: localTime() }));
 $('#createRoom').addEventListener('click', () => Online.create());
 $('#joinCode').addEventListener('click', () => Online.join($('#codeInput').value));
@@ -1196,7 +1207,7 @@ function setTab(tab) {
 $$('.tab').forEach(t => t.addEventListener('click', () => setTab(t.dataset.tab)));
 
 /* ----- ayarlar ----- */
-const SET_MAP = { setSound: 'sound', setLegal: 'showLegal', setCoords: 'coords', setAutoQueen: 'autoQueen', setPremove: 'premove', setFlip: 'hotseatFlip' };
+const SET_MAP = { setSound: 'sound', setLegal: 'showLegal', setCoords: 'coords', setAutoQueen: 'autoQueen', setPremove: 'premove', setFlip: 'hotseatFlip', setTabletop: 'tabletop' };
 function renderSettings() {
   for (const [id, k] of Object.entries(SET_MAP)) $('#' + id).checked = !!settings[k];
   $('#themes').innerHTML = Object.entries(THEMES).map(([k, [l, d, n]]) =>
