@@ -1,7 +1,7 @@
 /* Rok Satranç — Telefona kurulabilir sürüm ve sunucusuz çalışma.
    GitHub Pages gibi bir siteden açıldığında sunucu yoktur: online oda kurma kapanır, geri kalan her şey telefonun içinde çalışır. */
 var NO_SERVER = location.protocol === 'file:' || (location.protocol === 'https:' && !/^(localhost|127\.|\d+\.\d+\.\d+\.\d+$)/.test(location.hostname));
-const APP_VERSION = 'rok-v6'; // sw.js'teki VERSION ile aynı olmalı
+const APP_VERSION = 'rok-v7'; // sw.js'teki VERSION ile aynı olmalı
 
 const Pwa = {
   prompt: null, pendingReload: false,
