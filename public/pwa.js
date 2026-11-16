@@ -1,15 +1,31 @@
 /* Rok Satranç — Telefona kurulabilir sürüm ve sunucusuz çalışma.
    GitHub Pages gibi bir siteden açıldığında sunucu yoktur: online oda kurma kapanır, geri kalan her şey telefonun içinde çalışır. */
 var NO_SERVER = location.protocol === 'file:' || (location.protocol === 'https:' && !/^(localhost|127\.|\d+\.\d+\.\d+\.\d+$)/.test(location.hostname));
+const APP_VERSION = 'rok-v5'; // sw.js'teki VERSION ile aynı olmalı
 
 const Pwa = {
-  prompt: null,
+  prompt: null, pendingReload: false,
   init() {
-    if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+    if ('serviceWorker' in navigator && location.protocol === 'https:') {
+      const hadController = !!navigator.serviceWorker.controller;
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        // Uygulamaya her dönüldüğünde yeni sürüm var mı diye bak
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
+      }).catch(() => {});
+      // Yeni sürüm devreye girince sayfayı yenile; oyun sürüyorsa oyun bitip menüye dönünce yenile
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!hadController) return;
+        if (this.inGame()) { this.pendingReload = true; toast('Rok\'un yeni sürümü hazır. Menüye dönünce yüklenecek.', 4000); }
+        else location.reload();
+      });
+    }
+    const cr = $('#settingsModal .credit');
+    if (cr) cr.insertAdjacentHTML('beforeend', ` Sürüm: ${APP_VERSION.replace('rok-v', '')}.`);
     window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); this.prompt = e; this.renderBtn(); });
     window.addEventListener('appinstalled', () => { this.prompt = null; this.renderBtn(); toast('Rok telefonuna kuruldu!'); });
     if (NO_SERVER) this.noServer();
   },
+  inGame() { return !$('#game').hidden && G.mode && !G.over && G.moves.length > 0; },
   renderBtn() {
     let b = $('#installBtn');
     if (!this.prompt) { if (b) b.remove(); return; }

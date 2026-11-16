@@ -1142,6 +1142,7 @@ function goHome() {
   if (G.mode === 'online') Online.leave();
   Extra.leaveMode();
   G.mode = null; G.over = null; G.review = null;
+  if (typeof Pwa !== 'undefined' && Pwa.pendingReload) { location.reload(); return; } // bekleyen yeni sürüm
   showScreen('home');
   setTab(store.get('tab', 'home')); // sayfayı güncel verilerle yeniden çiz
   renderMe();
