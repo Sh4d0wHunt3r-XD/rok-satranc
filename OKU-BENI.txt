@@ -21,6 +21,19 @@ ARKADAŞLA OYNAMAK (Radmin VPN)
     uygulamaya izin ver" > Node.js'i bul > "Özel" kutusunu işaretle.
   - Radmin VPN'de ikinizin de bağlı (yeşil) göründüğünü kontrol et.
 
+TELEFONDA / İNTERNETTEN
+  Rok'un GitHub Pages adresini telefonun tarayıcısında aç. Tarayıcı
+  menüsünden "Ana ekrana ekle" dersen uygulama gibi kurulur ve internet
+  olmadan da açılır. Botlar, bulmacalar, dersler ve analiz telefonun
+  içinde çalışır. Sadece arkadaşla online oyun için baslat.bat gerekir.
+  Not: Telefondaki kayıtlar bilgisayardakilerden ayrıdır.
+
+CHESS.COM OYUNLARIN
+  Analiz bölümünde Chess.com kullanıcı adını yaz, "Oyunları getir" de.
+  Şifre gerekmez. Oyunların gelir, incelediğin oyunlardaki hatalar
+  "Hatalarından öğren" bulmacalarına eklenir. Kullanıcı adın kayıtlıysa
+  Rok her açılışta yeni oyunlarını kendisi getirir.
+
 KISAYOLLAR (oyun ekranında)
   Sol / sağ ok   hamleler arasında geri / ileri git
   F              tahtayı çevir

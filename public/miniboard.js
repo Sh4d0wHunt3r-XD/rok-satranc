@@ -43,8 +43,8 @@ class MiniBoard {
       let inner = p ? `<div class="mb-pc">${pieceSVG(p)}</div>` : '';
       if (this.stars.has(sq)) inner += STAR_SVG;
       if (this.targets.includes(sq)) inner += `<span class="${p ? 'mb-ring' : 'mb-dot'}"></span>`;
-      if (d >= 56) inner += `<span class="mb-co f">${'abcdefgh'[sq & 7]}</span>`;
-      if (d % 8 === 0) inner += `<span class="mb-co r">${8 - (sq >> 3)}</span>`;
+      if (this.coords !== false && d >= 56) inner += `<span class="mb-co f">${'abcdefgh'[sq & 7]}</span>`;
+      if (this.coords !== false && d % 8 === 0) inner += `<span class="mb-co r">${8 - (sq >> 3)}</span>`;
       h += `<div class="${c}" data-sq="${sq}">${inner}</div>`;
     }
     if (this.arrows.length) h += `<svg class="mb-arrows" viewBox="0 0 800 800">${this.arrows.map(a => this.arrow(a)).join('')}</svg>`;

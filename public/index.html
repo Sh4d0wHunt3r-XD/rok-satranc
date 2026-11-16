@@ -7,6 +7,13 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23ece4d6'/%3E%3Cpath d='M4 3h2v2h1V3h2v2h1V3h2v4l-1 1v4h1v2H4v-2h1V8L4 7z' fill='%23181613'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="pages.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#171512">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rok">
+<link rel="apple-touch-icon" href="icons/apple-180.png">
 </head>
 <body>
 
@@ -65,6 +72,7 @@
         <button class="tab" data-tab="puzzles" role="tab"><svg class="ic"><use href="#i-target"/></svg><span>Bulmacalar</span></button>
         <button class="tab" data-tab="learn" role="tab"><svg class="ic"><use href="#i-cap"/></svg><span>Öğren</span></button>
         <button class="tab" data-tab="openings" role="tab"><svg class="ic"><use href="#i-book"/></svg><span>Açılışlar</span></button>
+        <button class="tab" data-tab="train" role="tab"><svg class="ic"><use href="#i-flame"/></svg><span>Antrenman</span></button>
         <button class="tab" data-tab="tools" role="tab"><svg class="ic"><use href="#i-pulse"/></svg><span>Analiz</span></button>
         <span class="nav-head">Sen</span>
         <button class="tab" data-tab="history" role="tab"><svg class="ic"><use href="#i-chart"/></svg><span>İstatistik</span></button>
@@ -80,6 +88,7 @@
       <div class="tab-pane wide" id="pane-home"></div>
       <div class="tab-pane wide" id="pane-learn" hidden></div>
       <div class="tab-pane wide" id="pane-openings" hidden></div>
+      <div class="tab-pane wide" id="pane-train" hidden></div>
 
       <!-- Bot -->
       <div class="tab-pane" id="pane-bot" hidden>
@@ -161,6 +170,7 @@
           <h1>Analiz</h1>
           <p>Pozisyonları incele, kendi dizilişini kur ya da başka bir yerden oyun getir.</p>
         </header>
+        <div id="ccBox"></div>
         <div class="tool-row">
           <button class="tool" id="openAnalysis">
             <svg class="ic big"><use href="#i-pulse"/></svg>
@@ -316,6 +326,7 @@
 <script src="chess.js"></script>
 <script src="sf.js"></script>
 <script src="app.js"></script>
+<script src="bots.js"></script>
 <script src="extra.js"></script>
 <script src="drill.js"></script>
 <script src="miniboard.js"></script>
@@ -325,5 +336,9 @@
 <script src="home.js"></script>
 <script src="coach.js"></script>
 <script src="look.js"></script>
+<script src="chesscom.js"></script>
+<script src="train.js"></script>
+<script src="achievements.js"></script>
+<script src="pwa.js"></script>
 </body>
 </html>

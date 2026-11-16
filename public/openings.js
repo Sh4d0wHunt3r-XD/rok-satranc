@@ -33,10 +33,10 @@ const Openings = {
   render(keep) {
     const pane = $('#pane-openings');
     if (!this.cur) this.cur = REPS[0];
-    const L = this.learned();
+    const L = this.learned(), due = Srs.due('o:');
     const item = r => `<button class="op-item${this.cur.id === r.id ? ' on' : ''}" data-op="${r.id}">
       <span class="op-name">${esc(r.name)}</span>
-      <span class="op-tags">${r.rec ? '<em>önerilen</em>' : ''}${L[r.id] ? `<b>${icon('check')}${L[r.id]}×</b>` : ''}</span></button>`;
+      <span class="op-tags">${due.includes('o:' + r.id) ? '<i>tekrar zamanı</i>' : ''}${r.rec ? '<em>önerilen</em>' : ''}${L[r.id] ? `<b>${icon('check')}${L[r.id]}×</b>` : ''}</span></button>`;
     pane.innerHTML = `
       <header class="pane-head"><h1>Açılışlar</h1><p>Bir repertuvar seç, hamleleri ve fikirleri öğren, sonra ezberden oynayarak antrenman yap.</p></header>
       <div class="op-wrap">
@@ -175,6 +175,7 @@ const Openings = {
     const T = this.tr;
     T.done = true; T.msg = ''; Sound.play('notify');
     if (T.errors <= 1) { const L = this.learned(); L[this.cur.id] = (L[this.cur.id] || 0) + 1; store.set('openLearned', L); }
+    Srs.review('o:' + this.cur.id, T.errors <= 1);
     Activity.mark('op');
     this.render(true);
   }

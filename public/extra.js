@@ -453,6 +453,7 @@ const Puzzle = {
     this.rated = true;
     const seen = store.get('pzSeen', []); seen.push(this.cur.id); store.set('pzSeen', seen.slice(-2500));
     const st = store.get('pzStats', { ok: 0, fail: 0 }); st[score ? 'ok' : 'fail']++; store.set('pzStats', st);
+    if (!score && this.cur.rating) Srs.review('p:' + this.cur.id, false);
     if (!score) { const f = store.get('pzFails', []); f.push({ ts: Date.now(), themes: this.cur.themes }); store.set('pzFails', f.slice(-300)); }
     if (this.hintUsed) { this.delta = 0; return; }
     const r = this.rating(), n = st.ok + st.fail;
@@ -599,8 +600,9 @@ const History = {
       winner: G.over.winner, reason: G.over.reason, tc: G.tc, startFen: G.startFen, moves: G.moves.map(m => m.san), opening: G.opening,
       bot: G.mode === 'bot' ? G.bot : null
     };
-    const l = this.list(); l.unshift(e); store.set('history', l.slice(0, 300));
+    const l = this.list(); l.unshift(e); store.set('history', l.slice(0, 600));
     G.histId = e.id;
+    if (e.mode === 'bot' && e.winner && e.winner === e.my && Coach.on() && !G.coachWarns) store.set('cleanWins', store.get('cleanWins', 0) + 1);
     Activity.mark('gm');
   },
   outcome(e) { return !e.my ? null : e.winner == null ? 'draw' : e.winner === e.my ? 'win' : 'loss'; },
@@ -641,11 +643,13 @@ const History = {
         <div class="stat"><span class="label">Bulmaca puanı</span><div class="v">${Puzzle.rating()}</div><div class="sub">${(s => `${s.ok} / ${s.ok + s.fail} çözüldü`)(store.get('pzStats', { ok: 0, fail: 0 }))}</div></div>
         ${statCard('Botlara karşı', tally(e => e.mode === 'bot'))}
         ${statCard('Arkadaşlara karşı', tally(e => e.mode === 'online'))}
+        ${statCard('Chess.com', tally(e => e.mode === 'chesscom'))}
       </div>
       <div class="charts">
         <div class="block"><h2>Bot puanı</h2>${this.chart(store.get('ratingHist', []), '#c9a253')}</div>
         <div class="block"><h2>Bulmaca puanı</h2>${this.chart(store.get('pzHist', []), '#8fc98a')}</div>
       </div>
+      ${Achievements.html()}
       ${this.insights(l, tally, statCard)}
       <div class="block"><h2>Son oyunlar</h2>
         ${l.length ? `<div class="table-wrap"><table class="hist-table"><thead><tr><th>Tarih</th><th>Mod</th><th>Oyuncular</th><th>Sonuç</th><th>Hamle</th><th>İsabet</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`
@@ -659,7 +663,7 @@ const History = {
   },
   // Ayrıntılı istatistikler: renk, açılış, isabet, botlar
   insights(l, tally, statCard) {
-    const mine = l.filter(e => e.my && (e.mode === 'bot' || e.mode === 'online'));
+    const mine = l.filter(e => e.my && ['bot', 'online', 'chesscom'].includes(e.mode));
     if (!mine.length) return '';
     const wdl = t => { const n = t.win + t.draw + t.loss; return n ? `<div class="wdl"><div class="w" style="width:${t.win / n * 100}%"></div><div class="d" style="width:${t.draw / n * 100}%"></div><div class="l" style="width:${t.loss / n * 100}%"></div></div>` : ''; };
     const groups = new Map();
@@ -678,8 +682,8 @@ const History = {
     return `
       <div class="block"><h2>İstatistikler</h2>
         <div class="stats-row">
-          ${statCard('Beyazla', tally(e => e.my === 'w' && (e.mode === 'bot' || e.mode === 'online')))}
-          ${statCard('Siyahla', tally(e => e.my === 'b' && (e.mode === 'bot' || e.mode === 'online')))}
+          ${statCard('Beyazla', tally(e => e.my === 'w' && ['bot', 'online', 'chesscom'].includes(e.mode)))}
+          ${statCard('Siyahla', tally(e => e.my === 'b' && ['bot', 'online', 'chesscom'].includes(e.mode)))}
           <div class="stat"><span class="label">Ortalama isabet</span><div class="v">${rev.length ? avg(e => e.acc).toFixed(1) + '%' : '–'}</div><div class="sub">${rev.length} incelenmiş oyun</div></div>
           <div class="stat"><span class="label">Oyun başına</span><div class="v">${rev.length ? avg(e => (e.cnt && e.cnt.blunder) || 0).toFixed(1) : '–'}</div><div class="sub">büyük hata · ${rev.length ? avg(e => (e.cnt && e.cnt.mistake) || 0).toFixed(1) : '–'} hata · ${rev.length ? avg(e => (e.cnt && e.cnt.inaccuracy) || 0).toFixed(1) : '–'} belirsiz</div></div>
         </div>
@@ -812,6 +816,8 @@ const Extra = {
     if (tab === 'home') Home.render();
     if (tab === 'learn') Learn.renderHome();
     if (tab === 'openings') Openings.render();
+    if (tab === 'tools') ChessCom.render();
+    if (tab === 'train') Train.render();
   },
   playerInfo(color) {
     if (G.mode === 'analysis') {

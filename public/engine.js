@@ -124,11 +124,35 @@ const LEVELS = [
   { random: 0, depth: 30, noise: 0, time: 3000 }
 ];
 
-function think(fen, level, timeMs, histKeys, analyse) {
+// Tarz bonusu (santipiyon): bot karakterleri için. Seçimi değiştirir ama gürültü ve rastgelelik devam eder.
+function styleBonus(ch, m, style) {
+  if (!style) return 0;
+  const us = ch.turn, them = us === 'w' ? 'b' : 'w', ek = ch.kings[them], mk = ch.kings[us];
+  const cap = m.captured ? VAL[m.captured.toLowerCase()] : 0, mover = VAL[m.piece.toLowerCase()] || 0;
+  ch._make(m);
+  const check = ch.attacked(ch.kings[them], us);
+  ch._undo();
+  let b = 0;
+  if (style === 'attack') {
+    if (check) b += 45;
+    if (cap) b += 25;
+    b += (kingDist(m.from, ek) - kingDist(m.to, ek)) * 8;
+    if (m.piece.toLowerCase() === 'q' && kingDist(m.to, ek) <= 3) b += 15;
+  } else if (style === 'solid') {
+    if (m.castle) b += 60;
+    if (cap && cap >= mover) b += 30; // eşit ya da iyi takası sever
+    if (m.piece.toLowerCase() === 'p' && kingDist(m.from, mk) <= 1) b -= 35; // şahının önündeki piyonları oynamaz
+    if (check) b -= 10;
+    b += (kingDist(m.to, mk) <= 2 ? 6 : 0);
+  }
+  return b;
+}
+
+function think(fen, level, timeMs, histKeys, analyse, cfgOver, style) {
   const ch = new Chess(fen);
   const legal = ch._legal();
   if (!legal.length) return null;
-  const cfg = LEVELS[Math.max(0, Math.min(4, level))];
+  const cfg = cfgOver || LEVELS[Math.max(0, Math.min(4, level))];
   const pack = (m, score, depth) => ({ move: { from: m.from, to: m.to, promotion: m.promotion || '' }, score, depth });
   if (legal.length === 1 && !analyse) return pack(legal[0], 0, 0);
   if (Math.random() < cfg.random) return pack(legal[Math.floor(Math.random() * legal.length)], 0, 0);
@@ -136,7 +160,8 @@ function think(fen, level, timeMs, histKeys, analyse) {
   deadline = Date.now() + (timeMs || cfg.time);
   stopped = false; nodes = 0; killers = [];
   const seen = new Set(histKeys || []);
-  const exact = cfg.noise > 0;
+  const exact = cfg.noise > 0 || !!style;
+  const bonus = new Map(style ? legal.map(m => [m, styleBonus(ch, m, style)]) : []);
   const root = legal.map(m => ({ m, s: 0, o: scoreMove(m, 0) }));
   root.sort((a, b) => b.o - a.o);
   let done = 0;
@@ -164,7 +189,7 @@ function think(fen, level, timeMs, histKeys, analyse) {
   if (exact) {
     let bv = -Infinity;
     for (const rm of root) {
-      const v = rm.s + (Math.random() * 2 - 1) * cfg.noise;
+      const v = rm.s + (bonus.get(rm.m) || 0) + (Math.random() * 2 - 1) * cfg.noise;
       if (v > bv) { bv = v; best = rm; }
     }
   }
@@ -174,7 +199,7 @@ function think(fen, level, timeMs, histKeys, analyse) {
 if (typeof self !== 'undefined' && typeof importScripts === 'function') {
   self.onmessage = e => {
     const d = e.data;
-    const r = think(d.fen, d.level, d.timeMs, d.keys, d.analyse);
+    const r = think(d.fen, d.level, d.timeMs, d.keys, d.analyse, d.cfg, d.style);
     self.postMessage(Object.assign({ id: d.id }, r || { move: null }));
   };
 } else if (typeof module !== 'undefined') {

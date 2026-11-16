@@ -8,6 +8,8 @@ const Activity = {
     const keys = Object.keys(a).sort();
     if (keys.length > 400) delete a[keys[0]];
     store.set('activity', a);
+    const st = this.streak(); if (st > store.get('bestStreak', 0)) store.set('bestStreak', st);
+    if (typeof Achievements !== 'undefined') Achievements.check();
   },
   streak() {
     const a = this.all(), d = new Date();
@@ -30,7 +32,8 @@ const Home = {
     const pane = $('#pane-home');
     const st = Activity.streak(), td = Activity.today(), nx = Learn.nextLesson(), pr = Learn.progress();
     const P = PzPlus.path(), ds = PzPlus.dailyState(), L = Openings.learned();
-    const nextRep = REPS.find(r => r.rec && !L[r.id]) || REPS.find(r => !L[r.id]) || REPS[0];
+    const dueOp = Srs.due('o:').map(k => REPS.find(r => 'o:' + r.id === k)).filter(Boolean);
+    const nextRep = dueOp[0] || REPS.find(r => r.rec && !L[r.id]) || REPS.find(r => !L[r.id]) || REPS[0];
     const hist = History.list().slice(0, 7);
     const hr = new Date().getHours();
     const hello = hr < 6 ? 'İyi geceler' : hr < 12 ? 'Günaydın' : hr < 18 ? 'İyi günler' : 'İyi akşamlar';
@@ -40,6 +43,8 @@ const Home = {
       { on: !!td.ls, t: 'Bir ders bitir' },
       { on: !!td.gm, t: 'Bir oyun oyna' }
     ];
+    const dueN = PzPlus.srsDue().length;
+    if (dueN) todo.push({ on: false, t: `${dueN} tekrar bulmacasını bitir` });
     pane.innerHTML = `
       <header class="home-head">
         <div><h1>${hello}</h1><p class="muted">Bugün de biraz satranç. Her gün bir şey yaparsan serin büyür.</p></div>
@@ -78,7 +83,7 @@ const Home = {
           <div class="hc-foot"><b>Bulmaca çöz</b><span class="muted">Bulmaca puanı ${Puzzle.rating()}</span></div>
         </button>
         <button class="hcard link" id="hOpen">
-          <span class="label">Açılış antrenmanı</span>
+          <span class="label">${dueOp.length ? 'Açılış tekrarı' : 'Açılış antrenmanı'}</span>
           <h2>${esc(nextRep.name)}</h2>
           <p class="muted">${nextRep.side === 'w' ? 'Beyazla' : 'Siyahla'} · ${Object.keys(L).length}/${REPS.length} açılış ezberlendi</p>
           <div class="hc-foot"><b>Antrenmana başla</b></div>
@@ -96,7 +101,7 @@ const Home = {
             <div><span class="label">Bot</span><b>${rating()}</b></div>
             <div><span class="label">Bulmaca</span><b>${Puzzle.rating()}</b></div>
             <div><span class="label">Ders</span><b>${pr.n}<small>/${pr.total}</small></b></div>
-            <div><span class="label">Hatalar</span><b>${PzPlus.mistakes().length}</b></div>
+            <div><span class="label">Rozet</span><b>${Achievements.count()}<small>/${BADGES.length}</small></b></div>
           </div>
           ${Weekly.html()}
         </div>
@@ -127,11 +132,12 @@ const Home = {
   },
   row(e) {
     const o = History.outcome(e), opp = e.my === 'w' ? e.black : e.my === 'b' ? e.white : `${e.white} – ${e.black}`;
-    const elo = e.mode === 'bot' && e.bot != null && BOTS[e.bot] ? ` <span class="muted">(${BOTS[e.bot].elo})</span>` : '';
+    const oc = e.my === 'w' ? 'b' : 'w';
+    const elo = e.mode === 'bot' && e.bot != null && BOTS[e.bot] ? ` <span class="muted">(${BOTS[e.bot].elo})</span>` : e.elo ? ` <span class="muted">(${e.elo[oc]})</span>` : '';
     const sign = o === 'win' ? '+' : o === 'loss' ? '−' : '=';
     const d = new Date(e.ts);
     return `<div class="grow">
-      <span class="g-mode" title="${MODE_TR[e.mode] || ''}">${icon(e.mode === 'bot' ? 'bot' : e.mode === 'online' ? 'users' : 'board')}</span>
+      <span class="g-mode" title="${MODE_TR[e.mode] || ''}">${icon(e.mode === 'bot' ? 'bot' : e.mode === 'online' || e.mode === 'chesscom' ? 'users' : 'board')}</span>
       <span class="g-opp">${esc(opp)}${elo}<small>${d.toLocaleDateString('tr-TR')} · ${Math.ceil(e.moves.length / 2)} hamle${e.opening ? ' · ' + esc(e.opening) : ''}</small></span>
       <span class="g-acc">${e.acc != null ? e.acc.toFixed(1) + '%' : ''}</span>
       <span class="g-res ${o || 'draw'}">${sign}</span>

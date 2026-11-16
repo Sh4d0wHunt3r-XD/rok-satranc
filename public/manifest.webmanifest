@@ -1,0 +1,17 @@
+{
+  "name": "Rok Satranç",
+  "short_name": "Rok",
+  "description": "Bota karşı oyna, bulmaca çöz, ders ve açılış öğren. Ücretsiz ve reklamsız.",
+  "lang": "tr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#171512",
+  "theme_color": "#171512",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

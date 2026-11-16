@@ -274,3 +274,36 @@
   .rail-foot { flex: 1; justify-content: flex-end; }
   .me-chip { max-width: 190px; }
 }
+
+/* ----- Botlar, Chess.com, antrenman, rozetler ----- */
+.bot-tag { margin-left: 8px; font: 700 10.5px/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding: 3px 6px; border-radius: 4px; vertical-align: 2px; }
+.pz-cards { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.pz-card.hot { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.op-tags i { font-style: normal; color: #ee8a3c; font-weight: 700; }
+.cc-form { display: flex; gap: 8px; max-width: 520px; }
+.cc-form input { flex: 1; }
+.mb-sq.bad::before { content: ""; position: absolute; inset: 0; background: rgba(224, 97, 79, .6); }
+.co-top { display: flex; justify-content: space-between; align-items: flex-end; }
+.co-target { font: 800 64px/1 var(--mono); color: var(--accent); letter-spacing: .02em; }
+#coAct { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#coAct .btn.big { font: 800 22px var(--mono); }
+.badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+.badge { display: flex; flex-direction: column; gap: 3px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); opacity: .55; }
+.badge.on { opacity: 1; border-color: var(--accent); background: linear-gradient(135deg, var(--accent-soft), var(--surface)); }
+.bd-ic { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: var(--faint); margin-bottom: 4px; }
+.badge.on .bd-ic { background: var(--accent); color: var(--ink); }
+.bd-ic .ic { width: 16px; height: 16px; stroke-width: 2.6; }
+.badge b { font-size: 14px; }
+.badge small { font-size: 12px; color: var(--muted); line-height: 1.4; }
+@media (max-width: 700px) {
+  .tab[data-tab="train"] { order: 5; }
+  .tab[data-tab="history"] { order: 6; }
+  .co-target { font-size: 52px; }
+  .cc-form { flex-direction: column; }
+  .badges { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 900px) {
+  .shell > * { min-width: 0; }
+  .rail { max-width: 100vw; }
+  .tabs { min-width: 0; scrollbar-width: thin; }
+}

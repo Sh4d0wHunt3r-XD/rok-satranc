@@ -159,6 +159,16 @@ const UNITS = [
         { t: 'info', text: 'Kale rakip şahın alanını bir çizgiyle keser. Şahını rakip şahın karşısına getirince kaleyle şah çekip alanı bir sıra daralt.' },
         { t: 'drill', text: 'Gerçek bir rakip şaha karşı kaleyle mat et.', id: 'r' }
       ] },
+      { id: 'kare', title: 'Kare kuralı', sub: 'Şah piyonu yakalar mı?', steps: [
+        { t: 'info', text: 'Piyondan son sıraya kadar bir kare çiz: kenarı, piyonun gideceği kare sayısı kadar olsun. Sıra rakipteyken rakip şah bu kareye tek adımda girebiliyorsa piyonu yakalar. Giremiyorsa piyon vezir olur.', fen: '8/8/8/P4k2/8/8/8/7K b - - 0 1', arrows: [['a5', 'a8'], ['a5', 'd5']] },
+        { t: 'quiz', text: 'Sıra siyahta. Siyah şah a piyonunu yakalayabilir mi?', fen: '8/8/8/P4k2/8/8/8/7K b - - 0 1', opts: ['Evet', 'Hayır'], a: 1, why: 'Karenin kenarı d sütununda. Şah f5\'ten tek adımda d sütununa giremiyor, piyon kaçar.' },
+        { t: 'quiz', text: 'Peki şah e5\'teyse?', fen: '8/8/8/P3k3/8/8/8/7K b - - 0 1', opts: ['Evet', 'Hayır'], a: 0, why: 'Şah d5 ya da d6\'ya girip karenin içine giriyor, piyonu yakalar.' },
+        { t: 'play', text: 'Siyahsın. Piyonu yakala, vezir olmasına izin verme.', fen: '8/8/8/P3k3/8/8/8/7K b - - 0 1', goal: 'hold', moves: 8, ok: 'Piyonu durdurdun!' }
+      ] },
+      { id: 'opozisyon', title: 'Opozisyon', sub: 'Şahlar karşı karşıya', steps: [
+        { t: 'info', text: 'İki şah aralarında bir kare boşlukla karşı karşıya durduğunda, sırası gelen kenara çekilmek zorunda kalır. Buna opozisyon denir. Şahın piyonunun önünde ve 6. sıradaysa piyon vezir olur.', fen: '3k4/8/3K4/3P4/8/8/8/8 w - - 0 1' },
+        { t: 'play', text: 'Beyazsın. Piyonu vezir yap. Önce şahınla yol aç, piyonu acele ilerletme.', fen: '3k4/8/3K4/3P4/8/8/8/8 w - - 0 1', goal: 'promote', ok: 'Vezir oldun! Opozisyonu kullandın.' }
+      ] },
       { id: 'piyonson', title: 'Piyon oyun sonu', sub: 'Opozisyon ve terfi', steps: [
         { t: 'info', text: 'Piyon oyun sonunda şahın aktif olmalı. İki şah aralarında bir kare boşlukla karşı karşıya durduğunda, sırası gelen oyuncu geri çekilmek zorunda kalır. Buna opozisyon denir.' },
         { t: 'pz', theme: 'pawnEndgame', n: 3, max: 1300 }
@@ -166,6 +176,14 @@ const UNITS = [
       { id: 'kaleson', title: 'Kale oyun sonu', sub: 'En sık görülen son', steps: [
         { t: 'info', text: 'Kale oyun sonlarında kaleni aktif tut: rakip piyonların arkasına geç, kendi geçer piyonunun arkasında dur.' },
         { t: 'pz', theme: 'rookEndgame', n: 3, max: 1400 }
+      ] },
+      { id: 'lucena', title: 'Lucena pozisyonu', sub: 'Köprü kurarak kazan', steps: [
+        { t: 'info', text: 'Piyonun 7. sırada, şahın önünde ama dışarı çıkamıyor. Kural: kaleni 4. sıraya getir (köprü), sonra şahını çıkar. Rakip kale şah çekince kalen araya girer.', fen: '3K4/3P2k1/8/8/8/8/2r5/4R3 w - - 0 1', arrows: [['e1', 'e4']] },
+        { t: 'play', text: 'Beyazsın. Köprü kurup piyonu vezir yap. İlk hamle ipucu: Re4.', fen: '3K4/3P2k1/8/8/8/8/2r5/4R3 w - - 0 1', goal: 'promote', ok: 'Lucena tamam! Bu, kale oyun sonlarının en önemli kazanç yöntemi.' }
+      ] },
+      { id: 'philidor', title: 'Philidor pozisyonu', sub: 'Kale sonunda beraberlik', steps: [
+        { t: 'info', text: 'Savunuyorsan kaleni 6. sırada tut, rakip şahın ilerlemesine izin verme. Piyon 6. sıraya gelince kaleni en arkaya götür ve arkadan şah çekmeye başla.', fen: '4k3/1R6/r7/4PK2/8/8/8/8 b - - 0 1', arrows: [['a6', 'h6']] },
+        { t: 'play', text: 'Siyahsın. 12 hamle boyunca beraberliği tut: kalen 6. sırada kalsın.', fen: '4k3/1R6/r7/4PK2/8/8/8/8 b - - 0 1', goal: 'hold', moves: 12, ok: 'Beraberliği tuttun! Philidor savunmasını öğrendin.' }
       ] }
     ]
   }
@@ -283,7 +301,7 @@ const Learn = {
       mb.setBoard(b);
     } else {
       if (s.arrows) mb.arrows = s.arrows.map(([a, b]) => ({ from: sqIdx(a), to: sqIdx(b) }));
-      if (s.t !== 'find') {
+      if (s.t !== 'find' && s.t !== 'play') {
         if (s.line) mb.setChess(this.posOf(s));
         else mb.setBoard(fenToBoard(s.fen || START_FEN));
         this.renderSide();
@@ -291,7 +309,8 @@ const Learn = {
       }
       const ch = this.posOf(s);
       this.st.ch = ch;
-      {
+      if (s.t === 'play') { mb.orient = ch.turn; this.bindPlay(); mb.setChess(ch); }
+      else {
         this.st.k = 0;
         if (s.pre) {
           mb.orient = ch.turn === 'w' ? 'b' : 'w';
@@ -367,6 +386,58 @@ const Learn = {
     mb.setChess(ch); this.renderSide();
     setTimeout(() => { if (this.st !== st) return; ch.undo(); mb.last = []; st.busy = false; mb.setChess(ch); }, 700);
   },
+  /* ----- Rakibe karşı oynanan adım (oyun sonları) ----- */
+  bindPlay() {
+    const st = this.st, mb = this.mb;
+    st.me = st.ch.turn; st.n = 0;
+    mb.legal = sq => (st.busy || st.ok || st.lost ? [] : chessTargets(st.ch, sq, st.me));
+    mb.onMove = (f, t) => this.playMove(f, t);
+  },
+  playEnd(win, msg) {
+    const st = this.st;
+    if (win) { st.ok = true; st.fb = msg || st.s.ok || 'Başardın!'; st.fbk = 'ok'; Sound.play('notify'); }
+    else { st.lost = true; st.fb = msg + ' "Baştan" ile tekrar dene.'; st.fbk = 'bad'; Sound.play('illegal'); }
+    this.mb.setChess(st.ch); this.renderSide();
+  },
+  hasQueen(ch, color) { return ch.b.some(p => p === (color === 'w' ? 'Q' : 'q')); },
+  playMove(f, t) {
+    const st = this.st, s = st.s, ch = st.ch, mb = this.mb;
+    const res = chessMove(ch, f, t);
+    if (!res) return;
+    st.n++; mb.last = [res.from, res.to];
+    Sound.play(res.captured ? 'capture' : res.check ? 'check' : 'move');
+    const stt = ch.status();
+    if (stt.over) {
+      if (stt.reason === 'checkmate') return this.playEnd(true, 'Mat ettin!');
+      return s.goal === 'hold' ? this.playEnd(true) : this.playEnd(false, 'Oyun berabere bitti (' + (REASONS[stt.reason] || '') + ').');
+    }
+    if (s.goal === 'promote' && res.promotion) {
+      const safe = !ch.moves().some(m => m.to === res.to && m.captured);
+      if (safe || ch.attacked(res.to, st.me)) return this.playEnd(true);
+    }
+    if (s.goal === 'hold' && st.n >= s.moves) return this.playEnd(true);
+    st.busy = true; mb.setChess(ch); this.renderSide();
+    const fen = ch.fen(), mine = st;
+    const apply = mv => {
+      if (this.st !== mine || !mv) return;
+      const r = chessMove(ch, mv.from, mv.to, mv.promotion || 'q');
+      st.busy = false;
+      if (!r) return this.renderSide();
+      mb.last = [r.from, r.to];
+      Sound.play(r.captured ? 'capture' : r.check ? 'check' : 'move');
+      const s2 = ch.status();
+      if (s2.over) {
+        if (s2.reason === 'checkmate') return this.playEnd(false, 'Mat oldun.');
+        return s.goal === 'hold' ? this.playEnd(true) : this.playEnd(false, 'Oyun berabere bitti (' + (REASONS[s2.reason] || '') + '). Kazanmak için başka bir yol dene.');
+      }
+      if (s.goal === 'hold' && r.promotion) return this.playEnd(false, 'Rakip piyonunu vezir yaptı.');
+      if (s.goal === 'promote' && st.n > 3 && !ch.b.some(p => p === (st.me === 'w' ? 'P' : 'p')) && !this.hasQueen(ch, st.me)) return this.playEnd(false, 'Piyonunu kaybettin, artık kazanılamaz.');
+      mb.setChess(ch); this.renderSide();
+    };
+    const fallback = () => Eng.eval(fen, 700).then(r => apply(r && r.move)).catch(() => apply(null));
+    if (SF.ok === false) return fallback();
+    SF.search(fen, { movetime: 600 }).then(r => { const c = SF.toEngine(r); if (c) apply(c.move); else fallback(); }).catch(fallback);
+  },
   stepDone() {
     const st = this.st;
     st.ok = true; st.busy = false; st.fb = st.s.ok || 'Doğru!'; st.fbk = 'ok';
@@ -398,6 +469,7 @@ const Learn = {
     $('#lsSteps').innerHTML = this.steps.map((x, i) => `<span class="${i < this.si ? 'done' : i === this.si ? 'cur' : ''}"></span>`).join('');
     let t = `<p>${esc(s.text)}</p>`;
     if (s.t === 'quiz') t += `<div class="quiz">${s.opts.map((o, i) => `<button class="btn${st.ok && i === s.a ? ' correct' : ''}${!st.ok && st.picked === i ? ' wrong' : ''}" data-q="${i}">${esc(o)}</button>`).join('')}</div>`;
+    if (s.t === 'play') t += `<p class="muted">${s.goal === 'hold' ? `Hamlen: ${st.n || 0}/${s.moves}` : `Hamlen: ${st.n || 0}`}${st.busy ? ' · rakip düşünüyor…' : ''}</p>`;
     if (s.t === 'stars') t += `<p class="muted">Kalan yıldız: <b>${this.mb.stars.size}</b> · Hamle: ${st.moves}</p>`;
     if (s.t === 'drill') t += `<div class="row-gap"><button class="btn" id="lsDrill">${icon('play')}Mat antrenmanını aç</button></div>`;
     $('#lsText').innerHTML = t;
@@ -408,7 +480,7 @@ const Learn = {
     const canNext = st.ok || s.t === 'info' || s.t === 'drill';
     let h = '';
     if (s.t === 'find' && !st.ok) h += `<button class="btn" id="lsHint">${icon('bulb')}İpucu</button>`;
-    if (s.t === 'stars' || s.t === 'find') h += `<button class="btn ghost" id="lsRetry">${icon('repeat')}Baştan</button>`;
+    if (s.t === 'stars' || s.t === 'find' || s.t === 'play') h += `<button class="btn ghost" id="lsRetry">${icon('repeat')}Baştan</button>`;
     if (!canNext) h += `<button class="btn ghost" id="lsSkip">Atla</button>`;
     h += `<button class="btn primary" id="lsNext"${canNext ? '' : ' disabled'}>${last ? 'Dersi bitir' : 'Devam'}${icon('next')}</button>`;
     a.innerHTML = h;

@@ -261,7 +261,7 @@ function freezeClock() {
 function resetBoard(fen) {
   G.chess = new Chess(fen || undefined); G.fens = [G.chess.fen()]; G.moves = []; G.view = null; G.sel = null; G.targets = [];
   G.premove = null; G.arrows = []; G.marks.clear(); G.over = null; G.opening = ''; G.lowWarned = { w: false, b: false }; G.ratingDelta = null;
-  G.startFen = G.chess.fen(); G.saved = false; G.review = null; G.histId = null;
+  G.startFen = G.chess.fen(); G.saved = false; G.review = null; G.histId = null; G.coachWarns = 0;
   $('#promo').hidden = true;
 }
 
@@ -393,8 +393,10 @@ function botMove() {
     t = Math.max(60, Math.min(t, rem / 30 + G.tc.inc * 700));
   }
   pending[id] = { type: 'bot', started: now(), fen: G.chess.fen() };
+  const bk = !Drill.on() && Bots.bookMove(bot);
+  if (bk) { setTimeout(() => onEngine({ data: { id, move: bk, score: 0 } }), 250 + Math.random() * 450); renderPlayers(); return; }
   if (bot.sf) sfRequest(id, { movetime: t, elo: bot.sf === true ? null : bot.sf }, t);
-  else getWorker().postMessage({ id, fen: G.chess.fen(), level: G.bot, timeMs: t, keys: G.chess.keys });
+  else getWorker().postMessage({ id, fen: G.chess.fen(), level: bot.cfg ? 0 : G.bot, cfg: bot.cfg || null, style: bot.style || null, timeMs: t, keys: G.chess.keys });
   renderPlayers();
 }
 // Stockfish'e sor; olmazsa kendi motorumuzun en güçlü seviyesine dön.
@@ -920,7 +922,7 @@ function undo() {
 }
 function offerDrawBot() {
   if (G.over || G.moves.length < 10) { toast(`${BOTS[G.bot].name} bu kadar erken beraberliği kabul etmiyor`); return; }
-  const threshold = [60, 20, -40, -100, -150, -200, -250, -300][G.bot];
+  const threshold = [60, 20, -40, -100, -150, -200, -250, -300][G.bot] ?? (BOTS[G.bot].elo < 800 ? 40 : -60);
   if (!G.botBusy && G.lastBotScore <= threshold) { toast(`${BOTS[G.bot].name} beraberliği kabul etti`); endGame(null, 'agreement'); }
   else toast(`${BOTS[G.bot].name} beraberliği reddetti`);
 }
@@ -1134,11 +1136,11 @@ function renderMe() {
 let botSel = store.get('bot', 1);
 function renderBots() {
   const rec = store.get('rec', {});
-  $('#botGrid').innerHTML = BOTS.map((b, i) => {
+  $('#botGrid').innerHTML = Bots.order().map(([b, i]) => {
     const r = rec['b' + i];
     return `<button class="bot-row${i === botSel ? ' on' : ''}" data-bot="${i}" aria-pressed="${i === botSel}">
       <span class="bot-face" style="background:${b.color}">${pieceSVG(b.piece)}</span>
-      <span class="bot-main"><span class="bot-name">${b.name}<span class="bot-elo">${b.elo}</span></span><span class="bot-desc">${b.desc}</span></span>
+      <span class="bot-main"><span class="bot-name">${b.name}<span class="bot-elo">${b.elo}</span>${b.tag ? `<span class="bot-tag">${b.tag}</span>` : ''}</span><span class="bot-desc">${b.desc}</span></span>
       <span class="bot-side"><span class="bot-check">${icon('check')}</span>${r ? `<span class="bot-rec">${r.w}G ${r.d}B ${r.l}M</span>` : ''}</span>
     </button>`;
   }).join('');
@@ -1186,7 +1188,7 @@ function setTab(tab) {
   store.set('tab', tab);
   clearInterval(roomPoll);
   Extra.onTab(tab);
-  if (tab === 'online') {
+  if (tab === 'online' && !window.NO_SERVER) {
     Online.loadInfo(); Online.listRooms();
     roomPoll = setInterval(() => { if (!$('#home').hidden) Online.listRooms(); }, 2000);
   }
@@ -1221,5 +1223,5 @@ window.addEventListener('DOMContentLoaded', function boot() {
   renderMe(); renderBots();
   setTab('home');
   const code = new URLSearchParams(location.search).get('oda');
-  if (code) Online.join(code);
+  if (code && !window.NO_SERVER) Online.join(code);
 });

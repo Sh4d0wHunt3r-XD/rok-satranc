@@ -3,6 +3,21 @@ const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1
 const dayNo = () => { const d = new Date(); return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5); };
 const PATH_SIZE = 10;
 
+/* ----- Akıllı tekrar: yanlış yaptığın şey 1, 3, 7 ve 14 gün sonra tekrar gelir ----- */
+const SRS_DAYS = [1, 3, 7, 14];
+const Srs = {
+  all() { return store.get('srs', {}); },
+  // ok: doğru yaptın, bir sonraki aralığa geç; değilse en baştan (yarın)
+  review(key, ok, now0) {
+    const a = this.all(), x = a[key] || { step: -1 };
+    if (ok) { x.step++; if (x.step >= SRS_DAYS.length) { delete a[key]; store.set('srs', a); return true; } x.due = Date.now() + SRS_DAYS[x.step] * 864e5; }
+    else { x.step = -1; x.due = now0 ? Date.now() : Date.now() + 864e5; }
+    a[key] = x; store.set('srs', a); return false;
+  },
+  due(prefix) { const t = Date.now(); return Object.entries(this.all()).filter(([k, v]) => v.due <= t && (!prefix || k.startsWith(prefix))).sort((a, b) => a[1].due - b[1].due).map(([k]) => k); },
+  has(key) { return !!this.all()[key]; }
+};
+
 const PzPlus = {
   /* ----- Günün bulmacası ----- */
   dailyPuzzle() {
@@ -64,6 +79,7 @@ const PzPlus = {
       const who = G.meta.white && G.meta.black ? `${G.meta.white} – ${G.meta.black}` : 'oyunun';
       l.unshift({ id, fen: G.fens[i - 2], moves: [uciOf(prev), best], note: `${esc(who)} oyununda burada ${esc(m.san)} oynadın (${c.k === 'blunder' ? 'büyük hata' : 'hata'}). Daha iyisi: ${esc(c.bestSan || best)}.`, ts: Date.now() });
       have.add(id); n++;
+      Srs.review('m:' + id, false, true);
     }
     store.set('myMistakes', l.slice(0, 200));
     R.mistAdded = (R.mistAdded || 0) + n;
@@ -82,6 +98,7 @@ const PzPlus = {
   onReviewDone() {
     this.saveReview();
     this.captureMistakes();
+    Achievements.check();
   },
 
   /* ----- Ortak akış ----- */
@@ -104,10 +121,36 @@ const PzPlus = {
       }
       store.set('pzPath', P);
     }
-    if (S.kind === 'mist' && solvedClean) store.set('myMistakes', this.mistakes().filter(x => x.id !== p.id));
+    setTimeout(() => Achievements.check(), 50);
+    if (S.kind === 'mist' || S.kind === 'srs') {
+      const key = p._key || 'm:' + p.id;
+      const finished = Srs.review(key, solvedClean);
+      if (key.startsWith('m:') && solvedClean && (finished || !Srs.has(key))) { store.set('myMistakes', this.mistakes().filter(x => x.id !== p.id)); store.set('mistSolved', store.get('mistSolved', 0) + 1); }
+    }
+  },
+  /* ----- Tekrar oturumu ----- */
+  srsPuzzle(key) {
+    if (key.startsWith('p:')) { const p = Puzzle.data && Puzzle.data.find(x => x.id === key.slice(2)); return p && Object.assign({}, p, { _key: key }); }
+    if (key.startsWith('m:')) { const m = this.mistakes().find(x => x.id === key.slice(2)); return m && Object.assign(this.asPuzzle(m), { _key: key }); }
+    return null;
+  },
+  srsDue() { return Srs.due().filter(k => k.startsWith('p:') || k.startsWith('m:')); },
+  async startSrs() {
+    await Puzzle.load();
+    const q = this.srsDue();
+    if (!q.length) { toast('Bugün tekrar edilecek bir şey yok. Yanlış yaptığın bulmacalar burada belli aralıklarla tekrar karşına çıkar.', 4500); return; }
+    Puzzle.rush = null;
+    Puzzle.set = { kind: 'srs', unrated: true, queue: q, i: 0 };
+    const p = this.srsPuzzle(q[0]);
+    if (!p) { Srs.review(q[0], true); return this.startSrs(); }
+    Puzzle.start(p);
   },
   next() {
     const S = Puzzle.set;
+    if (S.kind === 'srs') {
+      for (S.i++; S.i < S.queue.length; S.i++) { const p = this.srsPuzzle(S.queue[S.i]); if (p) return Puzzle.start(p); }
+      Puzzle.set = null; toast('Bugünkü tekrarların bitti!', 3000); goHome(); return;
+    }
     if (S.kind === 'daily') { Puzzle.set = null; return Puzzle.next(); }
     if (S.kind === 'path') return this.startPath();
     if (S.kind === 'mist') {
@@ -122,6 +165,7 @@ const PzPlus = {
   label() {
     const S = Puzzle.set;
     if (S.kind === 'daily') return 'Günün bulmacası';
+    if (S.kind === 'srs') return `Tekrar · ${Math.min(S.i + 1, S.queue.length)}/${S.queue.length}`;
     if (S.kind === 'path') { const P = this.path(); return `Bulmaca yolu · Seviye ${P.level} · ${Math.min(P.idx + 1, PATH_SIZE)}/${PATH_SIZE}`; }
     return 'Hatalarından öğren';
   },
@@ -129,7 +173,7 @@ const PzPlus = {
     const S = Puzzle.set, p = Puzzle.cur;
     if (!S || !p) return '';
     let h = '';
-    if (S.kind === 'mist' && (Puzzle.state === 'done' || Puzzle.failed)) h += `<div class="comment">${p.note || ''}</div>`;
+    if ((S.kind === 'mist' || (S.kind === 'srs' && p.note)) && (Puzzle.state === 'done' || Puzzle.failed)) h += `<div class="comment">${p.note || ''}</div>`;
     if (S.kind === 'mist' && Puzzle.state === 'solve') h += '<div class="muted">Bu pozisyon kendi oyunundan. Orada yaptığın hatayı bu sefer yapma.</div>';
     if (S.kind === 'path' && S.levelDone && Puzzle.state === 'done') {
       const L = S.levelDone;
@@ -140,8 +184,9 @@ const PzPlus = {
 
   /* ----- Bulmacalar sekmesindeki üst kartlar ----- */
   block() {
-    const P = this.path(), ds = this.dailyState(), mc = this.mistakes().length;
+    const P = this.path(), ds = this.dailyState(), mc = this.mistakes().length, due = this.srsDue().length;
     return `<div class="pz-cards">
+      <button class="pz-card${due ? ' hot' : ''}" id="pzSrs"><span class="label">Tekrar zamanı</span><span class="pc-big">${due ? due + ' bulmaca' : 'Hepsi tamam'}</span><span class="muted">Yanlış yaptıkların 1, 3, 7 ve 14 gün sonra tekrar gelir</span></button>
       <button class="pz-card" id="pzDaily"><span class="label">Günün bulmacası</span><span class="pc-big">${ds === 'ok' ? 'Çözüldü' : ds === 'fail' ? 'Denendi' : 'Bugün'}</span><span class="muted">${new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })} · herkes için aynı bulmaca</span></button>
       <button class="pz-card" id="pzPath"><span class="label">Bulmaca yolu</span><span class="pc-big">Seviye ${P.level}</span>
         <span class="path-dots">${Array.from({ length: PATH_SIZE }, (_, i) => `<i class="${i < P.idx ? 'done' : i === P.idx ? 'cur' : ''}"></i>`).join('')}</span><span class="muted">Her seviyede 10 bulmaca, gittikçe zorlaşır</span></button>
@@ -150,6 +195,7 @@ const PzPlus = {
   },
   bind() {
     $('#pzDaily').onclick = () => this.startDaily();
+    $('#pzSrs').onclick = () => this.startSrs();
     $('#pzPath').onclick = () => this.startPath();
     $('#pzMist').onclick = () => this.startMistakes();
   }
