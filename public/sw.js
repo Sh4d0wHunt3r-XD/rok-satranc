@@ -1,6 +1,6 @@
 /* Rok Satranç — servis çalışanı: internetsiz de açılır, internet varken her zaman son sürümü getirir.
    Yeni sürüm yayınlarken VERSION'ı (ve pwa.js'teki APP_VERSION'ı) artır. */
-const VERSION = 'rok-v8';
+const VERSION = 'rok-v9';
 const FILES = [
   './', 'index.html', 'style.css', 'pages.css', 'manifest.webmanifest',
   'pieces.js', 'chess.js', 'sf.js', 'app.js', 'bots.js', 'extra.js', 'drill.js', 'miniboard.js', 'pzplus.js', 'learn.js',

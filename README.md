@@ -6,7 +6,7 @@
 
 - **Bota karşı oyna:** 400'den 3200'e 17 bot. Saldırgan, sağlam ve gambitçi karakterler açılışlarını her oyunda rastgele seçer, ezberlenemez.
 - **Koç modu:** Taş hediye edeceğin ya da mat yiyeceğin hamleden önce uyarır.
-- **Bulmacalar:** Lichess açık veritabanından 2966 bulmaca, temaya göre seçim, günün bulmacası, bulmaca yolu, bulmaca yarışı.
+- **Bulmacalar:** Lichess açık veritabanından 9057 bulmaca (2000'den fazlası 800 puanın altında), temaya göre seçim, günün bulmacası, bulmaca yolu, bulmaca yarışı.
 - **Akıllı tekrar:** Yanlış yaptığın bulmacalar ve açılışlar 1, 3, 7 ve 14 gün sonra tekrar gelir.
 - **Öğren:** 7 ünitede 33 etkileşimli ders. Oyun sonu derslerinde rakibi Stockfish oynar.
 - **Açılışlar:** 12 açılış, açılış ağacı ve ezberden oynama antrenmanı.
