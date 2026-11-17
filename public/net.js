@@ -21,11 +21,18 @@ const Net = {
   },
   genCode() { let c = ''; for (let i = 0; i < 5; i++) c += NET_CHARS[Math.floor(Math.random() * NET_CHARS.length)]; return c; },
   link() { return Share.base() + '#katil=' + this.code; },
+  // Her oda/katılım yeni bir oturumdur. Eski oturumun gecikmiş olayları ve yeniden bağlanma denemeleri
+  // (sid farklıysa) yok sayılır; yoksa yeni odaya katılırken eski odanın denemeleri bağlantıyı bozuyordu.
   reset() {
-    if (this.conn) { try { this.conn.close(); } catch (e) { /* */ } }
-    if (this.peer) { try { this.peer.destroy(); } catch (e) { /* */ } }
-    Object.assign(this, { peer: null, conn: null, role: null, code: null, no: 0, oppName: '', chat: [], drawOffer: null, rematch: { me: false, opp: false }, connected: false, retry: 0 });
+    this.sid = (this.sid || 0) + 1;
+    clearTimeout(this.retryTimer);
+    const conn = this.conn, peer = this.peer;
+    Object.assign(this, { peer: null, conn: null, role: null, code: null, no: 0, oppName: '', chat: [], drawOffer: null, rematch: { me: false, opp: false }, connected: false, retry: 0, joining: false });
+    if (conn) { try { conn.close(); } catch (e) { /* */ } }
+    if (peer) { try { peer.destroy(); } catch (e) { /* */ } }
+    if (G.mode === 'net') { stopBot(); G.mode = null; G.over = null; showScreen('home'); }
   },
+  later(fn, ms) { const sid = this.sid; clearTimeout(this.retryTimer); this.retryTimer = setTimeout(() => { if (sid === this.sid) fn(); }, ms); },
   errText(e) {
     return { 'peer-unavailable': 'Bu kodla açık bir oda yok. Kodu kontrol et ya da arkadaşından yeni oda kurmasını iste.', network: 'İnternet bağlantısı yok ya da zayıf.', 'server-error': 'Eşleştirme servisine ulaşılamadı, biraz sonra tekrar dene.', 'browser-incompatible': 'Bu tarayıcı internetten oyunu desteklemiyor.' }[e && e.type] || 'Bağlantı kurulamadı.';
   },
@@ -36,16 +43,21 @@ const Net = {
     this.reset();
     this.role = 'host'; this.tc = tc;
     this.hostColor = color === 'r' ? (Math.random() < .5 ? 'w' : 'b') : color;
+    const sid = this.sid;
     const open = () => {
       this.code = this.genCode();
-      this.peer = new Peer(NET_PREFIX + this.code, { debug: 0 });
-      this.peer.on('open', () => this.renderPane());
-      this.peer.on('connection', c => {
+      const peer = this.peer = new Peer(NET_PREFIX + this.code, { debug: 0 });
+      peer.on('open', () => { if (sid === this.sid) this.renderPane(); });
+      peer.on('connection', c => {
+        if (sid !== this.sid) { c.close(); return; }
         if (this.conn && this.conn.open && this.conn.peer !== c.peer) { c.on('open', () => { c.send({ t: 'full' }); setTimeout(() => c.close(), 500); }); return; }
         this.attach(c);
       });
-      this.peer.on('disconnected', () => { if (this.peer && !this.peer.destroyed) this.peer.reconnect(); });
-      this.peer.on('error', e => { if (e.type === 'unavailable-id') { this.peer.destroy(); open(); } else if (e.type !== 'peer-unavailable') toast(this.errText(e), 4000); });
+      peer.on('disconnected', () => { if (sid === this.sid && !peer.destroyed) peer.reconnect(); });
+      peer.on('error', e => {
+        if (sid !== this.sid) return;
+        if (e.type === 'unavailable-id') { peer.destroy(); open(); } else if (e.type !== 'peer-unavailable') toast(this.errText(e), 4000);
+      });
     };
     open();
     this.renderPane();
@@ -58,27 +70,34 @@ const Net = {
     if (!again) this.reset();
     if (this.peer) { try { this.peer.destroy(); } catch (e) { /* */ } }
     this.role = 'guest'; this.code = code;
-    this.peer = new Peer({ debug: 0 });
-    this.peer.on('open', () => {
-      const c = this.peer.connect(NET_PREFIX + code, { reliable: true });
-      this.attach(c);
+    const sid = this.sid, peer = this.peer = new Peer({ debug: 0 });
+    peer.on('open', () => {
+      if (sid !== this.sid || peer !== this.peer) return;
+      this.attach(peer.connect(NET_PREFIX + code, { reliable: true }));
     });
-    this.peer.on('error', e => {
-      if (again && this.retry < 8 && G.mode === 'net' && !G.over) { setTimeout(() => this.join(code, true), 3000); return; }
+    peer.on('error', e => {
+      if (sid !== this.sid || peer !== this.peer) return;
+      if (again && this.retry < 8 && G.mode === 'net' && !G.over) { this.retry++; this.later(() => this.join(code, true), 3000); return; }
+      this.joining = false;
       toast(this.errText(e), 4500); this.renderPane();
     });
     if (!again) { this.joining = true; this.renderPane(); }
+    // Eşleştirme servisi cevap vermezse sonsuza kadar "bağlanılıyor" yazmasın
+    if (!again) this.later(() => { if (!this.connected) { this.joining = false; toast('Odaya bağlanılamadı. Kodu kontrol edip tekrar dene.', 4000); this.renderPane(); } }, 15000);
   },
   attach(c) {
+    const sid = this.sid;
     this.conn = c;
     c.on('open', () => {
+      if (sid !== this.sid) { c.close(); return; }
+      clearTimeout(this.retryTimer);
       this.connected = true; this.retry = 0; this.joining = false;
       if (this.role === 'guest') this.send({ t: 'hello', name: this.name(), no: this.no });
       if (G.mode === 'net') { this.sys('Bağlantı kuruldu.'); render(); }
     });
-    c.on('data', d => this.onData(d));
-    c.on('close', () => this.lost());
-    c.on('error', () => this.lost());
+    c.on('data', d => { if (sid === this.sid && c === this.conn) this.onData(d); });
+    c.on('close', () => { if (sid === this.sid && c === this.conn) this.lost(); });
+    c.on('error', () => { if (sid === this.sid && c === this.conn) this.lost(); });
   },
   lost() {
     if (!this.connected) return;
@@ -86,7 +105,7 @@ const Net = {
     if (G.mode !== 'net') { this.renderPane(); return; }
     this.sys('Rakibin bağlantısı koptu. Yeniden bağlanılıyor…');
     render();
-    if (this.role === 'guest' && !G.over) { this.retry++; setTimeout(() => this.join(this.code, true), 2000); }
+    if (this.role === 'guest' && !G.over) { this.retry++; const code = this.code; this.later(() => this.join(code, true), 2000); }
   },
   send(m) { if (this.conn && this.conn.open) this.conn.send(m); },
 
